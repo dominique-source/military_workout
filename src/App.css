@@ -1,0 +1,222 @@
+/* ─── Reset & Base ──────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #0a0a0a;
+  --surface:   #141414;
+  --surface2:  #1e1e1e;
+  --border:    #2a2a2a;
+  --border2:   #333;
+  --text:      #f0f0f0;
+  --text2:     #888;
+  --text3:     #555;
+  --green:     #639922;
+  --green-dim: rgba(99,153,34,0.15);
+  --green-dim2:rgba(99,153,34,0.08);
+  --red:       #e24b4a;
+  --radius:    10px;
+  --radius-sm: 6px;
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'IBM Plex Mono', monospace;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Typography ────────────────────────────────────────────── */
+.t-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text2);
+}
+
+.t-display {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.t-mono {
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 600;
+}
+
+/* ─── Layout ────────────────────────────────────────────────── */
+.app {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 4rem;
+}
+
+/* ─── Cards ─────────────────────────────────────────────────── */
+.card {
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  transition: border-color 0.3s;
+}
+
+.card--active { border-color: var(--green); }
+.card--preview { border-color: rgba(99,153,34,0.5); }
+
+/* ─── Buttons ───────────────────────────────────────────────── */
+button { cursor: pointer; font-family: inherit; border: none; outline: none; }
+
+.btn-primary {
+  background: var(--green);
+  color: #fff;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 12px 20px;
+  border-radius: var(--radius-sm);
+  transition: opacity 0.15s;
+}
+.btn-primary:hover { opacity: 0.9; }
+.btn-primary:active { opacity: 0.8; }
+
+.btn-secondary {
+  background: transparent;
+  border: 0.5px solid var(--border2);
+  color: var(--text2);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  transition: border-color 0.15s, color 0.15s;
+}
+.btn-secondary:hover { border-color: var(--text2); color: var(--text); }
+
+.btn-icon {
+  background: transparent;
+  border: 0.5px solid var(--border2);
+  color: var(--text2);
+  font-size: 16px;
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  transition: border-color 0.15s, color 0.15s;
+}
+.btn-icon:hover { border-color: var(--text2); color: var(--text); }
+
+.btn-jump {
+  width: 100%;
+  margin-top: 10px;
+  background: transparent;
+  border: 0.5px solid var(--green);
+  color: var(--green);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  transition: background 0.15s;
+}
+.btn-jump:hover { background: var(--green-dim); }
+
+/* ─── Badge ─────────────────────────────────────────────────── */
+.badge {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 0.5px solid;
+  letter-spacing: 0.1em;
+}
+
+/* ─── Progress bar ──────────────────────────────────────────── */
+.progress-track {
+  background: var(--border);
+  border-radius: 2px;
+  height: 5px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--green);
+  border-radius: 2px;
+  transition: width 1s linear;
+}
+
+/* ─── Queue pill ────────────────────────────────────────────── */
+.pill {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 0.5px solid var(--border);
+  color: var(--text2);
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.25s;
+}
+.pill:hover { border-color: var(--border2); color: var(--text); }
+.pill--active { background: var(--green); border-color: var(--green); color: #fff; font-weight: 600; }
+.pill--done { background: var(--green-dim2); border-color: rgba(99,153,34,0.25); color: var(--text3); text-decoration: line-through; }
+.pill--next { background: var(--green-dim); border-color: rgba(99,153,34,0.5); color: var(--text); font-weight: 600; }
+.pill--preview { background: var(--green-dim); border-color: var(--green); color: var(--green); font-weight: 600; }
+.pill-rest {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  padding: 4px 9px;
+  border-radius: 4px;
+  border: 0.5px dashed rgba(99,153,34,0.4);
+  color: rgba(99,153,34,0.65);
+  white-space: nowrap;
+  transition: all 0.25s;
+}
+.pill-rest--active { background: var(--green-dim); border-color: var(--green); color: var(--green); }
+.pill-rest--done { border-color: rgba(99,153,34,0.2); color: var(--text3); }
+
+/* ─── Tracker squares ───────────────────────────────────────── */
+.sq {
+  aspect-ratio: 1;
+  border-radius: 3px;
+  border: 0.5px solid var(--border);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.sq:hover { border-color: var(--green); background: var(--green-dim); }
+.sq--next { background: var(--green-dim); border-color: rgba(99,153,34,0.5); }
+.sq--t1 { background: #7ab82e; border-color: transparent; }
+.sq--t2 { background: #639922; border-color: transparent; }
+.sq--t3 { background: #57b320; border-color: transparent; }
+.sq--t4 { background: #4a9e1a; border-color: transparent; }
+.sq--gold { background: #f5c518; border-color: transparent; }
+
+/* ─── Congrats banner ───────────────────────────────────────── */
+.congrats {
+  margin-top: 0.75rem;
+  padding: 10px 14px;
+  background: var(--green-dim);
+  border: 0.5px solid rgba(99,153,34,0.5);
+  border-radius: var(--radius-sm);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--green);
+  letter-spacing: 0.06em;
+  text-align: center;
+}
+
+/* ─── Animations ────────────────────────────────────────────── */
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
+@keyframes slidein { from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:translateY(0)} }
+@keyframes popin { 0%{transform:scale(1)} 40%{transform:scale(1.45)} 100%{transform:scale(1)} }
+
+.anim-pulse { animation: pulse 0.9s ease-in-out infinite; }
+.anim-slidein { animation: slidein 0.3s ease; }
+.anim-pop { animation: popin 0.25s ease; }
