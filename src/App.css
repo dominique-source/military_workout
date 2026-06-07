@@ -2,11 +2,11 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg:        #0a0a0a;
-  --surface:   #141414;
-  --surface2:  #1e1e1e;
-  --border:    #2a2a2a;
-  --border2:   #333;
+  --bg:        #0f1a0f;
+  --surface:   #172117;
+  --surface2:  #1f2e1f;
+  --border:    #2a3d2a;
+  --border2:   #3a4f3a;
   --text:      #f0f0f0;
   --text2:     #888;
   --text3:     #555;
@@ -20,6 +20,8 @@
 
 html, body {
   background: var(--bg);
+  background-image: radial-gradient(ellipse at top, #1a2e1a 0%, #0f1a0f 60%);
+  background-attachment: fixed;
   color: var(--text);
   font-family: 'IBM Plex Mono', monospace;
   min-height: 100vh;
