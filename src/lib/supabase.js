@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js'
 
 export const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
+  'https://gbssoaqdfjgbshcwkcpa.supabase.co',
+  'sb_publishable_B6K5tuvSXJgQ1yyf6l8ugg_Kt9ZpMo4'
 )
 
 // Generate or retrieve a unique device ID
