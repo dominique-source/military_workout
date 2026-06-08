@@ -221,12 +221,12 @@ export default function App() {
           {!running && phase !== 'done' && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'flex-end', marginBottom: 4 }}>
               <button
-                onClick={() => { const v = Math.max(10, workDur - 5); setWorkDur(v); setTimeLeft(v) }}
+                onClick={() => { const v = Math.max(10, workDur - 1); setWorkDur(v); setTimeLeft(v) }}
                 style={{ width: 28, height: 28, borderRadius: 6, background: 'var(--surface2)', border: '1px solid var(--border2)', color: 'var(--text)', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
               >−</button>
               <span className="t-mono" style={{ fontSize: 15, color: '#639922', minWidth: 36, textAlign: 'center' }}>{workDur}s</span>
               <button
-                onClick={() => { const v = Math.min(60, workDur + 5); setWorkDur(v); setTimeLeft(v) }}
+                onClick={() => { const v = Math.min(60, workDur + 1); setWorkDur(v); setTimeLeft(v) }}
                 style={{ width: 28, height: 28, borderRadius: 6, background: 'var(--surface2)', border: '1px solid var(--border2)', color: 'var(--text)', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
               >+</button>
             </div>
