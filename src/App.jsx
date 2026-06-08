@@ -240,8 +240,6 @@ export default function App() {
         />
       </div>
 
-      {/* Session tracker */}
-      <SessionTracker sessions={sessions} syncing={syncing} increment={increment} decrement={decrement} reset={resetSessions} setTo={setTo} />
     </div>
   )
 }
