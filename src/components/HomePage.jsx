@@ -3,8 +3,8 @@ import { useState, useRef } from 'react'
 // type: 'sessions' = basé sur total sessions, 'dur' = basé sur sessions à X secondes
 const BADGES = [
   { id: 1,  icon: '🎯', label: 'Première mission',   desc: '1 entraînement complété',              type: 'sessions', min: 1,   dur: null, need: 1   },
-  { id: 2,  icon: '🔥', label: 'En feu',              desc: '5 entraînements complétés',            type: 'sessions', min: 5,   dur: null, need: 1   },
-  { id: 3,  icon: '💪', label: 'Lancé',               desc: '10 entraînements complétés',           type: 'sessions', min: 10,  dur: null, need: 1   },
+  { id: 2,  icon: '🔥', label: 'En feu',              desc: '5 entraînements complétés',            type: 'sessions', min: 5,   dur: null, need: 5   },
+  { id: 3,  icon: '💪', label: 'Lancé',               desc: '10 entraînements complétés',           type: 'sessions', min: 10,  dur: null, need: 10  },
   { id: 4,  icon: '⏱️', label: '25 secondes',         desc: '10 sessions à 25s par exercice',       type: 'dur',      min: null, dur: 25,  need: 10  },
   { id: 5,  icon: '⚡', label: '26 secondes',         desc: '10 sessions à 26s par exercice',       type: 'dur',      min: null, dur: 26,  need: 10  },
   { id: 6,  icon: '🛡️', label: '27 secondes',         desc: '10 sessions à 27s par exercice',       type: 'dur',      min: null, dur: 27,  need: 10  },
@@ -14,7 +14,7 @@ const BADGES = [
   { id: 11, icon: '🔥', label: '3 jours de suite',    desc: '3 jours consécutifs (10 fois)',         type: 'streak',   streak: 3, need: 10  },
   { id: 12, icon: '💥', label: '4 jours de suite',    desc: '4 jours consécutifs (5 fois)',          type: 'streak',   streak: 4, need: 5   },
   { id: 13, icon: '⚔️', label: '5 jours de suite',    desc: '5 jours consécutifs (3 fois)',          type: 'streak',   streak: 5, need: 3   },
-  { id: 10, icon: '🏆', label: '100 entraînements',   desc: 'Statut élite atteint !',               type: 'sessions', min: 100, dur: null, need: 1   },
+  { id: 10, icon: '🏆', label: '100 entraînements',   desc: 'Statut élite atteint !',               type: 'sessions', min: 100, dur: null, need: 100 },
 ]
 
 function CalendarStrip({ history, onToggleDay }) {
