@@ -22,7 +22,11 @@ export function useSessions() {
 
       if (hist) {
         const dates = hist.map(r => r.session_date)
-        setHistory(dates)
+        setHistory(hist.map(r => ({
+          date: r.session_date,
+          work_dur: r.work_dur || 25,
+          profiles: r.profiles || [],
+        })))
         setSessions(dates.length)
         localStorage.setItem('mw_sessions', dates.length)
 
@@ -41,18 +45,19 @@ export function useSessions() {
   }, [deviceId])
 
   // ── Add a completed workout ───────────────────────────────
-  async function addHistoryEntry(workDur = 25, date = null) {
+  async function addHistoryEntry(workDur = 25, date = null, profiles = []) {
     const day = date || new Date().toISOString().split('T')[0]
-    if (history.includes(day)) return
+    if (history.find(h => h.date === day)) return
 
-    setHistory(h => [day, ...h])
+    const entry = { date: day, work_dur: workDur, profiles }
+    setHistory(h => [entry, ...h])
     setSessions(s => s + 1)
     setDurCounts(c => ({ ...c, [workDur]: (c[workDur] || 0) + 1 }))
 
     await supabase
       .from('session_history')
       .upsert(
-        { device_id: 'shared', session_date: day, work_dur: workDur },
+        { device_id: 'shared', session_date: day, work_dur: workDur, profiles },
         { onConflict: 'device_id,session_date', ignoreDuplicates: true }
       )
   }
@@ -60,7 +65,7 @@ export function useSessions() {
   // ── Remove a workout from history ─────────────────────────
   async function removeHistoryEntry(date) {
     setHistory(h => {
-      const next = h.filter(d => d !== date)
+      const next = h.filter(e => e.date !== date)
       setSessions(next.length)
       localStorage.setItem('mw_sessions', next.length)
       return next
@@ -75,10 +80,10 @@ export function useSessions() {
 
   // ── Toggle a day (long press on calendar) ─────────────────
   async function toggleHistoryEntry(date) {
-    if (history.includes(date)) {
+    if (history.find(h => h.date === date)) {
       await removeHistoryEntry(date)
     } else {
-      await addHistoryEntry(25, date)
+      await addHistoryEntry(25, date, [])
     }
   }
 

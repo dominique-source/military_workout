@@ -17,17 +17,28 @@ const BADGES = [
 function CalendarStrip({ history, onToggleDay }) {
   const longPressTimer = useRef(null)
   const [flashing, setFlashing] = useState(null)
+  const [popup, setPopup] = useState(null) // { dateStr, entry }
+  const didLongPress = useRef(false)
 
   function startLongPress(dateStr) {
+    didLongPress.current = false
     longPressTimer.current = setTimeout(() => {
+      didLongPress.current = true
       setFlashing(dateStr)
       onToggleDay(dateStr)
       setTimeout(() => setFlashing(null), 400)
     }, 600)
   }
 
-  function cancelLongPress() {
+  function cancelLongPress(dateStr, entry) {
     clearTimeout(longPressTimer.current)
+    if (!didLongPress.current) {
+      // Quick tap → show popup
+      if (entry) {
+        setPopup(p => p?.dateStr === dateStr ? null : { dateStr, entry })
+      }
+    }
+    didLongPress.current = false
   }
 
   const days = Array.from({ length: 35 }, (_, i) => {
@@ -36,8 +47,9 @@ function CalendarStrip({ history, onToggleDay }) {
     d.setDate(d.getDate() - (34 - i))
     const dateStr = d.toISOString().split('T')[0]
     const isToday = i === 34
-    const done = history.includes(dateStr)
-    return { dateStr, isToday, done, day: d.getDate(), month: d.getMonth() }
+    const entry = history.find(h => h.date === dateStr)
+    const done = !!entry
+    return { dateStr, isToday, done, entry, day: d.getDate(), month: d.getMonth() }
   })
 
   return (
@@ -49,13 +61,13 @@ function CalendarStrip({ history, onToggleDay }) {
         {days.map(({ dateStr, isToday, done, day, month }) => (
           <div
             key={dateStr}
-            title={`${dateStr} — long press pour ajouter/retirer`}
+            title={`${dateStr} — clic: détails, long press: ajouter/retirer`}
             onMouseDown={() => startLongPress(dateStr)}
-            onMouseUp={cancelLongPress}
-            onMouseLeave={cancelLongPress}
+            onMouseUp={() => cancelLongPress(dateStr, entry)}
+            onMouseLeave={() => clearTimeout(longPressTimer.current)}
             onTouchStart={e => { e.preventDefault(); startLongPress(dateStr) }}
-            onTouchEnd={cancelLongPress}
-            onTouchCancel={cancelLongPress}
+            onTouchEnd={() => cancelLongPress(dateStr, entry)}
+            onTouchCancel={() => clearTimeout(longPressTimer.current)}
             style={{
               width: 28, height: 28, borderRadius: 6,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -85,6 +97,36 @@ function CalendarStrip({ history, onToggleDay }) {
           <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 9, color: '#888' }}>Aujourd'hui</span>
         </div>
       </div>
+
+      {/* Popup détail au clic rapide */}
+      {popup && (
+        <div
+          onClick={() => setPopup(null)}
+          style={{
+            marginTop: 10,
+            background: '#a8e63d',
+            borderRadius: 10,
+            padding: '12px 16px',
+            textAlign: 'left',
+            cursor: 'pointer',
+          }}
+        >
+          <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 16, fontWeight: 900, color: '#000', letterSpacing: '0.04em', marginBottom: 4 }}>
+            🗓️ {popup.dateStr}
+          </div>
+          <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: '#1a3a00', lineHeight: 1.6 }}>
+            {popup.entry.profiles && popup.entry.profiles.length > 0
+              ? `✅ Military Workout complété par ${popup.entry.profiles.join(', ')}`
+              : '✅ Military Workout complété'}
+          </div>
+          <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: '#1a3a00', marginTop: 2 }}>
+            ⏱️ {popup.entry.work_dur}s par exercice
+          </div>
+          <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 9, color: '#2a5a00', marginTop: 6 }}>
+            Appuie pour fermer
+          </div>
+        </div>
+      )}
     </div>
   )
 }

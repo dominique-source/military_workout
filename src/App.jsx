@@ -14,7 +14,14 @@ export default function App() {
   // Always keep a fresh ref to session actions so useEffect never captures stale closures
   const sessionActionsRef = useRef({ increment, addHistoryEntry })
   useEffect(() => { sessionActionsRef.current = { increment, addHistoryEntry } })
-  const [workDur, setWorkDur]       = useState(25)        // adjustable seconds per drill
+  const [workDur, setWorkDur]       = useState(25)
+  const [activeProfiles, setActiveProfiles] = useState([])
+
+  const PROFILES = ['Éloi', 'Papa', 'Maman']
+
+  function toggleProfile(name) {
+    setActiveProfiles(p => p.includes(name) ? p.filter(x => x !== name) : [...p, name])
+  }        // adjustable seconds per drill
   const [exercises, setExercises]   = useState(() => smartShuffle(EXERCISES))
   const [phase, setPhase]           = useState('idle')   // idle | working | transition | resting | done
   const [cur, setCur]               = useState(0)
@@ -174,7 +181,7 @@ export default function App() {
   // ── Workout complete button ───────────────────────────────
   function handleComplete() {
     sessionActionsRef.current.increment()
-    sessionActionsRef.current.addHistoryEntry(workDur)
+    sessionActionsRef.current.addHistoryEntry(workDur, null, activeProfiles)
     handleReset()
     setScreen('home')
   }
@@ -217,6 +224,34 @@ export default function App() {
           <div className="t-display" style={{ fontSize: 22, color: 'var(--text)' }}>30 Drills · {workDur}s each</div>
         </div>
         <div style={{ textAlign: 'right' }}>
+
+          {/* Profile buttons */}
+          <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end', marginBottom: 8 }}>
+            {PROFILES.map(name => {
+              const active = activeProfiles.includes(name)
+              return (
+                <button
+                  key={name}
+                  onClick={() => toggleProfile(name)}
+                  style={{
+                    padding: '5px 10px',
+                    borderRadius: 6,
+                    border: `1px solid ${active ? '#a8e63d' : 'var(--border2)'}`,
+                    background: active ? '#a8e63d' : 'var(--surface2)',
+                    color: active ? '#000' : 'var(--text2)',
+                    fontFamily: "'Barlow Condensed', sans-serif",
+                    fontSize: 13, fontWeight: 700,
+                    cursor: 'pointer',
+                    letterSpacing: '0.04em',
+                    transition: 'all 0.15s',
+                  }}
+                >
+                  {name}
+                </button>
+              )
+            })}
+          </div>
+
           {/* +/- duration controls — only when idle or paused */}
           {!running && phase !== 'done' && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'flex-end', marginBottom: 4 }}>
