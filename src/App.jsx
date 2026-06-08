@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { EXERCISES, smartShuffle, WORK_DUR, TRANS_DUR, REST_DUR, REST_AFTER, TOTAL_TIME } from './data/exercises'
+import { EXERCISES, smartShuffle, TRANS_DUR, REST_DUR, REST_AFTER } from './data/exercises'
 import { useVoice } from './hooks/useVoice'
 import DrillCard from './components/DrillCard'
 import Queue from './components/Queue'
@@ -14,42 +14,45 @@ export default function App() {
   // Always keep a fresh ref to session actions so useEffect never captures stale closures
   const sessionActionsRef = useRef({ increment, addHistoryEntry })
   useEffect(() => { sessionActionsRef.current = { increment, addHistoryEntry } })
+  const [workDur, setWorkDur]       = useState(25)        // adjustable seconds per drill
   const [exercises, setExercises]   = useState(() => smartShuffle(EXERCISES))
   const [phase, setPhase]           = useState('idle')   // idle | working | transition | resting | done
   const [cur, setCur]               = useState(0)
-  const [timeLeft, setTimeLeft]     = useState(WORK_DUR)
+  const [timeLeft, setTimeLeft]     = useState(25)
   const [running, setRunning]       = useState(false)
   const [previewIdx, setPreviewIdx] = useState(null)
   const [isShuffled, setIsShuffled] = useState(false)
 
   const ivRef    = useRef(null)
-  const stateRef = useRef({ phase, cur, timeLeft, running, exercises })
+  const stateRef = useRef({ phase, cur, timeLeft, running, exercises, workDur })
   const { speak, cancel } = useVoice()
 
   // Keep ref in sync for use inside setInterval callback
   useEffect(() => {
-    stateRef.current = { phase, cur, timeLeft, running, exercises }
+    stateRef.current = { phase, cur, timeLeft, running, exercises, workDur }
   })
 
   // ── Progress calc ─────────────────────────────────────────
+  const totalTime = 30 * workDur + 29 * TRANS_DUR + 3 * REST_DUR
+
   function calcProgress(p, c, tl) {
     let done = 0
     for (let i = 0; i < c; i++) {
-      done += WORK_DUR
+      done += workDur
       if (i < 29) done += TRANS_DUR
       if (REST_AFTER.has(i)) done += REST_DUR
     }
-    if (p === 'working')    done += WORK_DUR  - tl
-    if (p === 'transition') done += WORK_DUR  + (TRANS_DUR - tl)
-    if (p === 'resting')    done += WORK_DUR  + TRANS_DUR + (REST_DUR - tl)
-    return Math.min(100, (done / TOTAL_TIME) * 100)
+    if (p === 'working')    done += workDur  - tl
+    if (p === 'transition') done += workDur  + (TRANS_DUR - tl)
+    if (p === 'resting')    done += workDur  + TRANS_DUR + (REST_DUR - tl)
+    return Math.min(100, (done / totalTime) * 100)
   }
 
   const progress = calcProgress(phase, cur, timeLeft)
 
   // ── Tick ─────────────────────────────────────────────────
   const tick = useCallback(() => {
-    const { phase: p, cur: c, timeLeft: tl, exercises: exs } = stateRef.current
+    const { phase: p, cur: c, timeLeft: tl, exercises: exs, workDur: wd } = stateRef.current
 
     const newTl = tl - 1
 
@@ -85,7 +88,7 @@ export default function App() {
       const next = c + 1
       setCur(next)
       setPhase('working')
-      setTimeLeft(WORK_DUR)
+      setTimeLeft(wd)
       speak('Go')
     }
   }, [speak])
@@ -97,7 +100,7 @@ export default function App() {
     setRunning(true)
     if (phase === 'idle') {
       setPhase('working')
-      setTimeLeft(WORK_DUR)
+      setTimeLeft(workDur)
       speak('Go')
     }
     clearInterval(ivRef.current)
@@ -118,7 +121,7 @@ export default function App() {
     setRunning(false)
     setPhase('idle')
     setCur(0)
-    setTimeLeft(WORK_DUR)
+    setTimeLeft(workDur)
     setPreviewIdx(null)
   }
 
@@ -131,7 +134,7 @@ export default function App() {
     setRunning(false)
     setPhase('idle')
     setCur(0)
-    setTimeLeft(WORK_DUR)
+    setTimeLeft(workDur)
     setPreviewIdx(null)
   }
 
@@ -142,7 +145,7 @@ export default function App() {
       setPreviewIdx(null)
       setCur(i)
       setPhase('working')
-      setTimeLeft(WORK_DUR)
+      setTimeLeft(workDur)
       speak(exercises[i].name)
     } else {
       // Toggle preview
@@ -155,7 +158,7 @@ export default function App() {
     if (previewIdx === null) return
     setCur(previewIdx)
     setPhase('working')
-    setTimeLeft(WORK_DUR)
+    setTimeLeft(workDur)
     setPreviewIdx(null)
     setRunning(true)
     clearInterval(ivRef.current)
@@ -211,11 +214,25 @@ export default function App() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
         <div>
           <div className="t-label" style={{ marginBottom: 3 }}>Military Blitz</div>
-          <div className="t-display" style={{ fontSize: 22, color: 'var(--text)' }}>30 Drills · 25s each</div>
+          <div className="t-display" style={{ fontSize: 22, color: 'var(--text)' }}>30 Drills · {workDur}s each</div>
         </div>
         <div style={{ textAlign: 'right' }}>
-          <div className="t-label" style={{ marginBottom: 3 }}>Total</div>
-          <div className="t-mono" style={{ fontSize: 14 }}>~16:25</div>
+          {/* +/- duration controls — only when idle or paused */}
+          {!running && phase !== 'done' && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'flex-end', marginBottom: 4 }}>
+              <button
+                onClick={() => { const v = Math.max(10, workDur - 5); setWorkDur(v); setTimeLeft(v) }}
+                style={{ width: 28, height: 28, borderRadius: 6, background: 'var(--surface2)', border: '1px solid var(--border2)', color: 'var(--text)', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              >−</button>
+              <span className="t-mono" style={{ fontSize: 15, color: '#639922', minWidth: 36, textAlign: 'center' }}>{workDur}s</span>
+              <button
+                onClick={() => { const v = Math.min(60, workDur + 5); setWorkDur(v); setTimeLeft(v) }}
+                style={{ width: 28, height: 28, borderRadius: 6, background: 'var(--surface2)', border: '1px solid var(--border2)', color: 'var(--text)', fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              >+</button>
+            </div>
+          )}
+          <div className="t-label" style={{ marginBottom: 2 }}>Total</div>
+          <div className="t-mono" style={{ fontSize: 14 }}>~{Math.floor(totalTime / 60)}:{String(totalTime % 60).padStart(2, '0')}</div>
         </div>
       </div>
 
