@@ -15,7 +15,7 @@ export default function App() {
   const sessionActionsRef = useRef({ increment, addHistoryEntry })
   useEffect(() => { sessionActionsRef.current = { increment, addHistoryEntry } })
   const [workDur, setWorkDur]       = useState(25)
-  const [activeProfiles, setActiveProfiles] = useState([])
+  const [activeProfiles, setActiveProfiles] = useState(['Éloi', 'Papa', 'Maman'])
 
   const PROFILES = ['Éloi', 'Papa', 'Maman']
 
