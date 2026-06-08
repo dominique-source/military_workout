@@ -163,9 +163,13 @@ export default function App() {
     speak('Go')
   }
 
+  // ── Voice announcement when workout done ─────────────────
+  useEffect(() => {
+    if (phase === 'done') speak('Military Workout terminé')
+  }, [phase])
+
   // ── Workout complete button ───────────────────────────────
   function handleComplete() {
-    speak('Military Workout terminé')
     sessionActionsRef.current.increment()
     sessionActionsRef.current.addHistoryEntry()
     handleReset()

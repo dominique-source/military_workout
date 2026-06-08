@@ -53,12 +53,12 @@ export function useSessions() {
 
   async function addHistoryEntry() {
     const today = new Date().toISOString().split('T')[0]
-    // Avoid duplicates
-    if (history.includes(today)) return
-    const { error } = await supabase
+    // Always update local state immediately
+    setHistory(h => h.includes(today) ? h : [today, ...h])
+    // Upsert to avoid duplicate key errors in DB
+    await supabase
       .from('session_history')
-      .insert({ device_id: 'shared', session_date: today })
-    if (!error) setHistory(h => [today, ...h])
+      .upsert({ device_id: 'shared', session_date: today }, { onConflict: 'device_id,session_date', ignoreDuplicates: true })
   }
 
   async function increment() {
