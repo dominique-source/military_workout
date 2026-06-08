@@ -26,7 +26,7 @@ function getSquareClass(i, marked) {
 }
 
 export default function SessionTracker() {
-  const [marked, setMarked] = useState(0)
+  const [marked, setMarked] = useState(() => parseInt(localStorage.getItem('mw_sessions') || '0', 10))
   const [popIdx, setPopIdx] = useState(null)
 
   function pop(i) {
@@ -34,26 +34,32 @@ export default function SessionTracker() {
     setTimeout(() => setPopIdx(null), 300)
   }
 
+  function save(val) {
+    localStorage.setItem('mw_sessions', val)
+  }
+
   function toggleSquare(i) {
     let next
     if (i === marked - 1) next = i
     else next = Math.min(100, i + 1)
-    setMarked(Math.max(0, Math.min(100, next)))
+    const clamped = Math.max(0, Math.min(100, next))
+    setMarked(clamped)
+    save(clamped)
     pop(i)
   }
 
   function markOne() {
     if (marked >= 100) return
     pop(marked)
-    setMarked(m => Math.min(100, m + 1))
+    setMarked(m => { const v = Math.min(100, m + 1); save(v); return v })
   }
 
   function undoMark() {
-    if (marked > 0) setMarked(m => m - 1)
+    if (marked > 0) setMarked(m => { const v = m - 1; save(v); return v })
   }
 
   function clearAll() {
-    if (window.confirm('Reset all 100 squares?')) setMarked(0)
+    if (window.confirm('Reset all 100 squares?')) { setMarked(0); save(0) }
   }
 
   const activeCongratsKey = [100, 75, 50, 25, 10].find(m => marked >= m)
