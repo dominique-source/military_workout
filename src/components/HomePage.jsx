@@ -58,7 +58,7 @@ function CalendarStrip({ history, onToggleDay }) {
         📅 Historique — 35 derniers jours
       </div>
       <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-        {days.map(({ dateStr, isToday, done, day, month }) => (
+        {days.map(({ dateStr, isToday, done, entry, day, month }) => (
           <div
             key={dateStr}
             title={`${dateStr} — clic: détails, long press: ajouter/retirer`}
