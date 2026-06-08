@@ -203,14 +203,8 @@ export default function App() {
           onClick={() => { handleReset(); setScreen('home') }}
           title="Back to Home"
           style={{
-            background: 'none',
-            border: 'none',
-            padding: 0,
-            cursor: 'pointer',
-            borderRadius: 12,
-            overflow: 'hidden',
-            width: 48, height: 48,
-            flexShrink: 0,
+            background: 'none', border: 'none', padding: 0,
+            cursor: 'pointer', flexShrink: 0,
             transition: 'transform 0.15s, opacity 0.15s',
           }}
           onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.08)'; e.currentTarget.style.opacity = '0.85' }}
@@ -218,7 +212,9 @@ export default function App() {
           onMouseDown={e => e.currentTarget.style.transform = 'scale(0.95)'}
           onMouseUp={e => e.currentTarget.style.transform = 'scale(1.08)'}
         >
-          <img src="/icon.png" alt="Home" style={{ width: '100%', height: '100%', display: 'block', objectFit: 'cover' }} />
+          <div style={{ width: 48, height: 48, borderRadius: 12, overflow: 'hidden' }}>
+            <img src="/icon.png" alt="Home" style={{ width: '115%', height: '115%', marginLeft: '-7.5%', marginTop: '-7.5%', display: 'block', objectFit: 'cover' }} />
+          </div>
         </button>
       </div>
 
