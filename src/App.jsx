@@ -163,14 +163,14 @@ export default function App() {
     speak('Go')
   }
 
-  // ── Workout complete ─────────────────────────────────────
-  useEffect(() => {
-    if (phase === 'done') {
-      speak('Military Workout terminé')
-      sessionActionsRef.current.increment()
-      sessionActionsRef.current.addHistoryEntry()
-    }
-  }, [phase])
+  // ── Workout complete button ───────────────────────────────
+  function handleComplete() {
+    speak('Military Workout terminé')
+    sessionActionsRef.current.increment()
+    sessionActionsRef.current.addHistoryEntry()
+    handleReset()
+    setScreen('home')
+  }
 
   // ── Cleanup ──────────────────────────────────────────────
   useEffect(() => () => { clearInterval(ivRef.current); cancel() }, [cancel])
@@ -229,6 +229,7 @@ export default function App() {
         onReset={handleReset}
         onShuffle={handleShuffle}
         onJumpToPreview={handleJumpToPreview}
+        onComplete={handleComplete}
       />
 
       {/* Queue */}

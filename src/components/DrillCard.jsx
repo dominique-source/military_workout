@@ -4,6 +4,7 @@ import { REST_AFTER } from '../data/exercises'
 export default function DrillCard({
   exercises, phase, cur, timeLeft, running, previewIdx,
   onStart, onPause, onReset, onShuffle, onJumpToPreview,
+  onComplete,
   progress,
 }) {
   const ex = exercises[cur] || exercises[0]
@@ -159,6 +160,31 @@ export default function DrillCard({
         <button className="btn-icon" onClick={onReset} title="Reset">↺</button>
         <button className="btn-icon" onClick={onShuffle} title="Shuffle">⇄</button>
       </div>
+
+      {/* Workout done CTA */}
+      {phase === 'done' && (
+        <button
+          onClick={onComplete}
+          style={{
+            marginTop: 14,
+            width: '100%',
+            background: '#a8e63d',
+            border: 'none',
+            borderRadius: 8,
+            padding: '16px 0',
+            fontFamily: "'Barlow Condensed', sans-serif",
+            fontSize: 22,
+            fontWeight: 900,
+            letterSpacing: '0.06em',
+            color: '#000',
+            cursor: 'pointer',
+            boxShadow: '0 0 24px rgba(168,230,61,0.45)',
+            textTransform: 'uppercase',
+          }}
+        >
+          🏆 Military Workout Terminé !
+        </button>
+      )}
 
       {/* Jump to preview button */}
       {isPreview && (
