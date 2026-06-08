@@ -165,8 +165,11 @@ export default function HomePage({ onEnter, sessions = 0, history = [], durCount
         style={{
           background: 'none', border: 'none', cursor: 'pointer', padding: 0,
           borderRadius: 28,
+          overflow: 'hidden',
           boxShadow: '0 0 40px rgba(99,153,34,0.25), 0 8px 32px rgba(0,0,0,0.6)',
           width: 220, height: 220,
+          display: 'block',
+          flexShrink: 0,
         }}
         onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.05)' }}
         onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)' }}
@@ -174,7 +177,7 @@ export default function HomePage({ onEnter, sessions = 0, history = [], durCount
         onMouseUp={e => { e.currentTarget.style.transform = 'scale(1.05)' }}
         title="Commencer l'entraînement"
       >
-        <img src="/icon.png" alt="Military Workout" style={{ width: '100%', height: '100%', borderRadius: 28, display: 'block' }} />
+        <img src="/icon.png" alt="Military Workout" style={{ width: '100%', height: '100%', display: 'block', objectFit: 'cover' }} />
       </button>
 
       {/* Title */}

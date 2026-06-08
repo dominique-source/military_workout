@@ -208,6 +208,9 @@ export default function App() {
             padding: 0,
             cursor: 'pointer',
             borderRadius: 12,
+            overflow: 'hidden',
+            width: 48, height: 48,
+            flexShrink: 0,
             transition: 'transform 0.15s, opacity 0.15s',
           }}
           onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.08)'; e.currentTarget.style.opacity = '0.85' }}
@@ -215,7 +218,7 @@ export default function App() {
           onMouseDown={e => e.currentTarget.style.transform = 'scale(0.95)'}
           onMouseUp={e => e.currentTarget.style.transform = 'scale(1.08)'}
         >
-          <img src="/icon.png" alt="Home" style={{ width: 48, height: 48, borderRadius: 12, display: 'block' }} />
+          <img src="/icon.png" alt="Home" style={{ width: '100%', height: '100%', display: 'block', objectFit: 'cover' }} />
         </button>
       </div>
 
