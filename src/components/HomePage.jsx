@@ -11,10 +11,10 @@ const BADGES = [
   { id: 7,  icon: '🎖️', label: '28 secondes',         desc: '10 sessions à 28s par exercice',       type: 'dur',      min: null, dur: 28,  need: 10  },
   { id: 8,  icon: '🌟', label: '29 secondes',         desc: '10 sessions à 29s par exercice',       type: 'dur',      min: null, dur: 29,  need: 10  },
   { id: 9,  icon: '🏅', label: '30 secondes',         desc: '10 sessions à 30s par exercice',       type: 'dur',      min: null, dur: 30,  need: 10  },
-  { id: 10, icon: '🏆', label: '100 entraînements',   desc: 'Statut élite atteint !',               type: 'sessions', min: 100, dur: null, need: 1   },
   { id: 11, icon: '🔥', label: '3 jours de suite',    desc: '3 jours consécutifs (10 fois)',         type: 'streak',   streak: 3, need: 10  },
   { id: 12, icon: '💥', label: '4 jours de suite',    desc: '4 jours consécutifs (5 fois)',          type: 'streak',   streak: 4, need: 5   },
   { id: 13, icon: '⚔️', label: '5 jours de suite',    desc: '5 jours consécutifs (3 fois)',          type: 'streak',   streak: 5, need: 3   },
+  { id: 10, icon: '🏆', label: '100 entraînements',   desc: 'Statut élite atteint !',               type: 'sessions', min: 100, dur: null, need: 1   },
 ]
 
 function CalendarStrip({ history, onToggleDay }) {
