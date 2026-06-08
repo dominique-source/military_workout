@@ -170,26 +170,21 @@ export default function App() {
       <div style={{ marginBottom: '1rem' }}>
         <button
           onClick={() => { handleReset(); setScreen('home') }}
+          title="Back to Home"
           style={{
-            background: 'transparent',
-            border: '1px solid #2a3d2a',
-            color: '#888',
-            fontFamily: "'Barlow Condensed', sans-serif",
-            fontSize: 14,
-            fontWeight: 600,
-            letterSpacing: '0.08em',
-            padding: '7px 14px',
-            borderRadius: 6,
+            background: 'none',
+            border: 'none',
+            padding: 0,
             cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            transition: 'color 0.15s, border-color 0.15s',
+            borderRadius: 12,
+            transition: 'transform 0.15s, opacity 0.15s',
           }}
-          onMouseEnter={e => { e.currentTarget.style.color = '#f0f0f0'; e.currentTarget.style.borderColor = '#3a4f3a' }}
-          onMouseLeave={e => { e.currentTarget.style.color = '#888'; e.currentTarget.style.borderColor = '#2a3d2a' }}
+          onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.08)'; e.currentTarget.style.opacity = '0.85' }}
+          onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.opacity = '1' }}
+          onMouseDown={e => e.currentTarget.style.transform = 'scale(0.95)'}
+          onMouseUp={e => e.currentTarget.style.transform = 'scale(1.08)'}
         >
-          ← Home
+          <img src="/icon.png" alt="Home" style={{ width: 48, height: 48, borderRadius: 12, display: 'block' }} />
         </button>
       </div>
 
