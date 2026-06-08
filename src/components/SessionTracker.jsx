@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useSessions } from '../hooks/useSessions'
 
 const MILESTONES = {
   10:  '10 done 🔥',
@@ -10,10 +11,10 @@ const MILESTONES = {
 
 const CONGRATS = {
   10:  "🔥 10 sessions. You've officially started something.",
-  25:  "💪 25 sessions done. The habit is real.",
-  50:  "🏆 50 sessions. Consistency is your superpower.",
-  75:  "⚡ 75 sessions — you are in the top 1%.",
-  100: "🎖️ 100 WORKOUTS COMPLETE. ELITE STATUS ACHIEVED.",
+  25:  "💪 25 sessions done. La routine est réelle.",
+  50:  "🏆 50 sessions. La constance est ton superpouvoir.",
+  75:  "⚡ 75 sessions — tu es dans le top 1%.",
+  100: "🎖️ 100 ENTRAÎNEMENTS. STATUT ÉLITE ATTEINT.",
 }
 
 function getSquareClass(i, marked) {
@@ -26,7 +27,7 @@ function getSquareClass(i, marked) {
 }
 
 export default function SessionTracker() {
-  const [marked, setMarked] = useState(() => parseInt(localStorage.getItem('mw_sessions') || '0', 10))
+  const { sessions, syncing, increment, decrement, reset, setTo } = useSessions()
   const [popIdx, setPopIdx] = useState(null)
 
   function pop(i) {
@@ -34,35 +35,27 @@ export default function SessionTracker() {
     setTimeout(() => setPopIdx(null), 300)
   }
 
-  function save(val) {
-    localStorage.setItem('mw_sessions', val)
-  }
-
   function toggleSquare(i) {
-    let next
-    if (i === marked - 1) next = i
-    else next = Math.min(100, i + 1)
-    const clamped = Math.max(0, Math.min(100, next))
-    setMarked(clamped)
-    save(clamped)
     pop(i)
+    if (i === sessions - 1) decrement()
+    else setTo(i + 1)
   }
 
   function markOne() {
-    if (marked >= 100) return
-    pop(marked)
-    setMarked(m => { const v = Math.min(100, m + 1); save(v); return v })
+    if (sessions >= 100) return
+    pop(sessions)
+    increment()
   }
 
   function undoMark() {
-    if (marked > 0) setMarked(m => { const v = m - 1; save(v); return v })
+    decrement()
   }
 
   function clearAll() {
-    if (window.confirm('Reset all 100 squares?')) { setMarked(0); save(0) }
+    if (window.confirm('Reset all 100 squares?')) reset()
   }
 
-  const activeCongratsKey = [100, 75, 50, 25, 10].find(m => marked >= m)
+  const activeCongratsKey = [100, 75, 50, 25, 10].find(m => sessions >= m)
 
   return (
     <div className="card">
@@ -70,12 +63,16 @@ export default function SessionTracker() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
         <div>
           <div className="t-label" style={{ marginBottom: 3 }}>Session Tracker</div>
-          <div className="t-display" style={{ fontSize: 16, color: 'var(--text)' }}>Mark each completed workout</div>
+          <div className="t-display" style={{ fontSize: 16, color: 'var(--text)' }}>
+            Marque chaque entraînement complété
+          </div>
         </div>
         <div style={{ textAlign: 'right' }}>
-          <div className="t-label" style={{ marginBottom: 2 }}>Completed</div>
+          <div className="t-label" style={{ marginBottom: 2 }}>
+            {syncing ? '⏳ sync...' : 'Complétés'}
+          </div>
           <div className="t-mono" style={{ fontSize: 22, color: '#639922' }}>
-            {marked} <span style={{ fontSize: 13, color: 'var(--text2)' }}>/ 100</span>
+            {sessions} <span style={{ fontSize: 13, color: 'var(--text2)' }}>/ 100</span>
           </div>
         </div>
       </div>
@@ -92,7 +89,7 @@ export default function SessionTracker() {
         {Array.from({ length: 100 }, (_, i) => (
           <div
             key={i}
-            className={`${getSquareClass(i, marked)}${popIdx === i ? ' anim-pop' : ''}`}
+            className={`${getSquareClass(i, sessions)}${popIdx === i ? ' anim-pop' : ''}`}
             title={`Session ${i + 1}`}
             onClick={() => toggleSquare(i)}
           />
@@ -100,9 +97,9 @@ export default function SessionTracker() {
       </div>
 
       {/* Milestone badges */}
-      {marked > 0 && (
+      {sessions > 0 && (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: '1rem' }}>
-          {[10, 25, 50, 75, 100].filter(m => marked >= m).map(m => (
+          {[10, 25, 50, 75, 100].filter(m => sessions >= m).map(m => (
             <span
               key={m}
               className="badge"
@@ -117,7 +114,7 @@ export default function SessionTracker() {
       {/* Buttons */}
       <div style={{ display: 'flex', gap: 8 }}>
         <button className="btn-primary" onClick={markOne} style={{ flex: 1, fontSize: 16 }}>
-          + MARK DONE
+          + MARQUER FAIT
         </button>
         <button className="btn-icon" onClick={undoMark} title="Undo" style={{ width: 'auto', padding: '0 14px', fontSize: 12 }}>
           UNDO

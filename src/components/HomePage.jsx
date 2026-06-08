@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useSessions } from '../hooks/useSessions'
 
 const BADGES = [
   { id: 1,  icon: '🎯', label: 'Première mission',  desc: '1 entraînement complété',     min: 1   },
@@ -14,7 +15,7 @@ const BADGES = [
 ]
 
 export default function HomePage({ onEnter }) {
-  const sessions = parseInt(localStorage.getItem('mw_sessions') || '0', 10)
+  const { sessions, syncing } = useSessions()
   const [selected, setSelected] = useState(null)
 
   return (
@@ -51,7 +52,7 @@ export default function HomePage({ onEnter }) {
       {/* Badges */}
       <div style={{ marginTop: '2.5rem', width: '100%', maxWidth: 420 }}>
         <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#888', marginBottom: '1rem' }}>
-          🎖️ Badges — {sessions} entraînement{sessions !== 1 ? 's' : ''} complété{sessions !== 1 ? 's' : ''}
+          {syncing ? '⏳ Synchronisation...' : `🎖️ Badges — ${sessions} entraînement${sessions !== 1 ? 's' : ''} complété${sessions !== 1 ? 's' : ''}`}
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10 }}>
