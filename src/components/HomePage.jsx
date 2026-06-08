@@ -78,9 +78,9 @@ export default function HomePage({ onEnter }) {
                 onClick={() => setSelected(isSelected ? null : i)}
                 style={{
                   background: isSelected
-                    ? (unlocked ? 'rgba(99,153,34,0.2)' : 'rgba(255,255,255,0.07)')
+                    ? (unlocked ? '#a8e63d' : 'rgba(255,255,255,0.07)')
                     : (unlocked ? 'rgba(99,153,34,0.12)' : 'rgba(255,255,255,0.03)'),
-                  border: `1px solid ${isSelected ? (unlocked ? '#639922' : '#555') : (unlocked ? 'rgba(99,153,34,0.45)' : 'rgba(255,255,255,0.07)')}`,
+                  border: `1px solid ${isSelected ? (unlocked ? '#a8e63d' : '#555') : (unlocked ? 'rgba(99,153,34,0.45)' : 'rgba(255,255,255,0.07)')}`,
                   borderRadius: 12,
                   padding: isSelected ? '16px 14px' : '12px 14px',
                   display: 'flex',
@@ -92,7 +92,7 @@ export default function HomePage({ onEnter }) {
                   cursor: 'pointer',
                   transition: 'all 0.25s ease',
                   transform: isSelected ? 'scale(1.04)' : 'scale(1)',
-                  boxShadow: isSelected ? (unlocked ? '0 0 20px rgba(99,153,34,0.25)' : '0 0 12px rgba(255,255,255,0.05)') : 'none',
+                  boxShadow: isSelected ? (unlocked ? '0 0 24px rgba(168,230,61,0.45)' : '0 0 12px rgba(255,255,255,0.05)') : 'none',
                   position: 'relative',
                   gridColumn: i === 9 ? '1 / -1' : undefined,
                   zIndex: isSelected ? 2 : 1,
@@ -110,10 +110,10 @@ export default function HomePage({ onEnter }) {
 
                 {/* Text */}
                 <div style={{ flex: isSelected ? 'unset' : 1 }}>
-                  <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: isSelected ? 18 : 15, fontWeight: 700, color: unlocked ? '#f0f0f0' : '#555', letterSpacing: '0.03em', lineHeight: 1.2 }}>
+                  <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: isSelected ? 18 : 15, fontWeight: 700, color: isSelected && unlocked ? '#000' : (unlocked ? '#f0f0f0' : '#555'), letterSpacing: '0.03em', lineHeight: 1.2 }}>
                     {badge.label}
                   </div>
-                  <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 10, color: unlocked ? '#639922' : '#444', marginTop: 2 }}>
+                  <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 10, color: isSelected && unlocked ? '#1a3a00' : (unlocked ? '#639922' : '#444'), marginTop: 2 }}>
                     {badge.desc}
                   </div>
                 </div>
@@ -122,25 +122,25 @@ export default function HomePage({ onEnter }) {
                 {isSelected && (
                   <div style={{ width: '100%', marginTop: 6 }}>
                     {/* Count */}
-                    <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: '#888', marginBottom: 6 }}>
+                    <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: unlocked ? '#1a3a00' : '#888', marginBottom: 6 }}>
                       {unlocked
                         ? '✅ Badge déverrouillé !'
                         : `${sessions} / ${badge.min} entraînements`}
                     </div>
 
                     {/* Progress track */}
-                    <div style={{ background: '#1f2e1f', borderRadius: 4, height: 8, overflow: 'hidden', width: '100%' }}>
+                    <div style={{ background: unlocked ? 'rgba(0,0,0,0.2)' : '#1f2e1f', borderRadius: 4, height: 8, overflow: 'hidden', width: '100%' }}>
                       <div style={{
                         height: '100%',
                         width: `${pct}%`,
-                        background: unlocked ? '#639922' : 'linear-gradient(90deg, #3a5a3a, #639922)',
+                        background: unlocked ? '#1a3a00' : 'linear-gradient(90deg, #3a5a3a, #639922)',
                         borderRadius: 4,
                         transition: 'width 0.6s ease',
                       }} />
                     </div>
 
                     {/* Percentage */}
-                    <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 13, fontWeight: 700, color: unlocked ? '#639922' : '#888', marginTop: 5 }}>
+                    <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 13, fontWeight: 700, color: unlocked ? '#000' : '#888', marginTop: 5 }}>
                       {pct}%
                     </div>
                   </div>
