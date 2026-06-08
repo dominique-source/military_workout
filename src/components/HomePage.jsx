@@ -16,7 +16,8 @@ const BADGES = [
 
 function CalendarStrip({ history }) {
   const days = Array.from({ length: 35 }, (_, i) => {
-    const d = new Date('2026-06-07')
+    const d = new Date()
+    d.setHours(0, 0, 0, 0)
     d.setDate(d.getDate() - (34 - i))
     const dateStr = d.toISOString().split('T')[0]
     const isToday = i === 34
