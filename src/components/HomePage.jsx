@@ -74,20 +74,6 @@ export default function HomePage({ onEnter }) {
         </div>
       </div>
 
-      {/* Subtitle */}
-      <div
-        style={{
-          marginTop: '0.75rem',
-          fontFamily: "'IBM Plex Mono', monospace",
-          fontSize: 12,
-          color: '#888',
-          letterSpacing: '0.1em',
-          textTransform: 'uppercase',
-        }}
-      >
-        30 Drills · 25s each · ~16 min
-      </div>
-
       {/* CTA */}
       <button
         onClick={onEnter}
