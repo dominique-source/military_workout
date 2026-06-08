@@ -53,7 +53,7 @@ function CalendarStrip({ history, onToggleDay }) {
             onMouseDown={() => startLongPress(dateStr)}
             onMouseUp={cancelLongPress}
             onMouseLeave={cancelLongPress}
-            onTouchStart={() => startLongPress(dateStr)}
+            onTouchStart={e => { e.preventDefault(); startLongPress(dateStr) }}
             onTouchEnd={cancelLongPress}
             onTouchCancel={cancelLongPress}
             style={{
@@ -66,6 +66,8 @@ function CalendarStrip({ history, onToggleDay }) {
               flexShrink: 0,
               cursor: 'pointer',
               userSelect: 'none',
+              WebkitUserSelect: 'none',
+              WebkitTouchCallout: 'none',
               transition: 'background 0.15s',
             }}
           >
