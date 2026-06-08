@@ -4,8 +4,10 @@ import { useVoice } from './hooks/useVoice'
 import DrillCard from './components/DrillCard'
 import Queue from './components/Queue'
 import SessionTracker from './components/SessionTracker'
+import HomePage from './components/HomePage'
 
 export default function App() {
+  const [screen, setScreen] = useState('home')  // 'home' | 'workout'
   const [exercises, setExercises]   = useState(() => smartShuffle(EXERCISES))
   const [phase, setPhase]           = useState('idle')   // idle | working | transition | resting | done
   const [cur, setCur]               = useState(0)
@@ -157,6 +159,10 @@ export default function App() {
 
   // ── Cleanup ──────────────────────────────────────────────
   useEffect(() => () => { clearInterval(ivRef.current); cancel() }, [cancel])
+
+  if (screen === 'home') {
+    return <HomePage onEnter={() => setScreen('workout')} />
+  }
 
   return (
     <div className="app">
