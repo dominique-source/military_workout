@@ -212,9 +212,7 @@ export default function App() {
           onMouseDown={e => e.currentTarget.style.transform = 'scale(0.95)'}
           onMouseUp={e => e.currentTarget.style.transform = 'scale(1.08)'}
         >
-          <div style={{ width: 48, height: 48, borderRadius: 12, overflow: 'hidden' }}>
-            <img src="/icon.png" alt="Home" style={{ width: '115%', height: '115%', marginLeft: '-7.5%', marginTop: '-7.5%', display: 'block', objectFit: 'cover' }} />
-          </div>
+          <img src="/icon.png" alt="Home" style={{ width: 48, height: 48, display: 'block' }} />
         </button>
       </div>
 

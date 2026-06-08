@@ -174,14 +174,7 @@ export default function HomePage({ onEnter, sessions = 0, history = [], durCount
         onMouseUp={e => { e.currentTarget.style.transform = 'scale(1.05)' }}
         title="Commencer l'entraînement"
       >
-        <div style={{
-          width: 220, height: 220,
-          borderRadius: 36,
-          overflow: 'hidden',
-          display: 'block',
-        }}>
-          <img src="/icon.png" alt="Military Workout" style={{ width: '115%', height: '115%', marginLeft: '-7.5%', marginTop: '-7.5%', display: 'block', objectFit: 'cover' }} />
-        </div>
+        <img src="/icon.png" alt="Military Workout" style={{ width: 220, height: 220, display: 'block' }} />
       </button>
 
       {/* Title */}
