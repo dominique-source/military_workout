@@ -166,6 +166,33 @@ export default function App() {
 
   return (
     <div className="app">
+      {/* Back to home */}
+      <div style={{ marginBottom: '1rem' }}>
+        <button
+          onClick={() => { handleReset(); setScreen('home') }}
+          style={{
+            background: 'transparent',
+            border: '1px solid #2a3d2a',
+            color: '#888',
+            fontFamily: "'Barlow Condensed', sans-serif",
+            fontSize: 14,
+            fontWeight: 600,
+            letterSpacing: '0.08em',
+            padding: '7px 14px',
+            borderRadius: 6,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            transition: 'color 0.15s, border-color 0.15s',
+          }}
+          onMouseEnter={e => { e.currentTarget.style.color = '#f0f0f0'; e.currentTarget.style.borderColor = '#3a4f3a' }}
+          onMouseLeave={e => { e.currentTarget.style.color = '#888'; e.currentTarget.style.borderColor = '#2a3d2a' }}
+        >
+          ← Home
+        </button>
+      </div>
+
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
         <div>

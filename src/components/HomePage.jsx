@@ -74,29 +74,6 @@ export default function HomePage({ onEnter }) {
         </div>
       </div>
 
-      {/* CTA */}
-      <button
-        onClick={onEnter}
-        style={{
-          marginTop: '2.5rem',
-          background: '#639922',
-          color: '#fff',
-          fontFamily: "'Barlow Condensed', sans-serif",
-          fontSize: 20,
-          fontWeight: 700,
-          letterSpacing: '0.1em',
-          padding: '14px 40px',
-          borderRadius: 8,
-          border: 'none',
-          cursor: 'pointer',
-          textTransform: 'uppercase',
-          transition: 'opacity 0.15s',
-        }}
-        onMouseEnter={e => e.currentTarget.style.opacity = '0.85'}
-        onMouseLeave={e => e.currentTarget.style.opacity = '1'}
-      >
-        ▶ Start Daily Workout
-      </button>
     </div>
   )
 }
