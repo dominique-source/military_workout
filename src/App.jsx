@@ -10,6 +10,10 @@ import { useSessions } from './hooks/useSessions'
 export default function App() {
   const [screen, setScreen] = useState('home')  // 'home' | 'workout'
   const { sessions, history, syncing, increment, decrement, reset: resetSessions, setTo, addHistoryEntry } = useSessions()
+
+  // Always keep a fresh ref to session actions so useEffect never captures stale closures
+  const sessionActionsRef = useRef({ increment, addHistoryEntry })
+  useEffect(() => { sessionActionsRef.current = { increment, addHistoryEntry } })
   const [exercises, setExercises]   = useState(() => smartShuffle(EXERCISES))
   const [phase, setPhase]           = useState('idle')   // idle | working | transition | resting | done
   const [cur, setCur]               = useState(0)
@@ -163,8 +167,8 @@ export default function App() {
   useEffect(() => {
     if (phase === 'done') {
       speak('Military Workout terminé')
-      increment()
-      addHistoryEntry()
+      sessionActionsRef.current.increment()
+      sessionActionsRef.current.addHistoryEntry()
     }
   }, [phase])
 
