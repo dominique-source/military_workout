@@ -12,6 +12,9 @@ const BADGES = [
   { id: 8,  icon: '🌟', label: '29 secondes',         desc: '10 sessions à 29s par exercice',       type: 'dur',      min: null, dur: 29,  need: 10  },
   { id: 9,  icon: '🏅', label: '30 secondes',         desc: '10 sessions à 30s par exercice',       type: 'dur',      min: null, dur: 30,  need: 10  },
   { id: 10, icon: '🏆', label: '100 entraînements',   desc: 'Statut élite atteint !',               type: 'sessions', min: 100, dur: null, need: 1   },
+  { id: 11, icon: '🔥', label: '3 jours de suite',    desc: '3 jours consécutifs (10 fois)',         type: 'streak',   streak: 3, need: 10  },
+  { id: 12, icon: '💥', label: '4 jours de suite',    desc: '4 jours consécutifs (5 fois)',          type: 'streak',   streak: 4, need: 5   },
+  { id: 13, icon: '⚔️', label: '5 jours de suite',    desc: '5 jours consécutifs (3 fois)',          type: 'streak',   streak: 5, need: 3   },
 ]
 
 function CalendarStrip({ history, onToggleDay }) {
@@ -146,7 +149,7 @@ function CalendarStrip({ history, onToggleDay }) {
   )
 }
 
-export default function HomePage({ onEnter, sessions = 0, history = [], durCounts = {}, syncing = false, onToggleDay }) {
+export default function HomePage({ onEnter, sessions = 0, history = [], durCounts = {}, streakCounts = {}, syncing = false, onToggleDay }) {
   const [selected, setSelected] = useState(null)
 
   return (
@@ -188,8 +191,10 @@ export default function HomePage({ onEnter, sessions = 0, history = [], durCount
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10 }}>
           {BADGES.map((badge, i) => {
-            const current = badge.type === 'dur' ? (durCounts[badge.dur] || 0) : sessions
-            const target  = badge.type === 'dur' ? badge.need : badge.min
+            const current = badge.type === 'dur'    ? (durCounts[badge.dur] || 0)
+                          : badge.type === 'streak' ? (streakCounts[badge.streak] || 0)
+                          : sessions
+            const target  = badge.need || badge.min
             const unlocked = current >= target
             const isSelected = selected === i
             const pct = Math.min(100, Math.round((current / target) * 100))
@@ -272,7 +277,10 @@ export default function HomePage({ onEnter, sessions = 0, history = [], durCount
                 {isSelected && (
                   <div style={{ width: '100%', marginTop: 4 }}>
                     <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: unlocked ? '#1a3a00' : '#aaa', marginBottom: 8, fontWeight: 600 }}>
-                      {unlocked ? '✅ Badge déverrouillé !' : `${current} / ${target} ${badge.type === 'dur' ? `sessions à ${badge.dur}s` : 'entraînements'}`}
+                      {unlocked ? '✅ Badge déverrouillé !' :
+                        badge.type === 'dur'    ? `${current} / ${target} sessions à ${badge.dur}s` :
+                        badge.type === 'streak' ? `${current} / ${target} fois ${badge.streak} jours de suite` :
+                        `${current} / ${target} entraînements`}
                     </div>
 
                     {/* Track */}

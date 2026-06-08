@@ -3,10 +3,28 @@ import { supabase, getDeviceId } from '../lib/supabase'
 
 export function useSessions() {
   const [sessions, setSessions] = useState(0)
-  const [history, setHistory]   = useState([])      // array of 'YYYY-MM-DD' strings
+  const [history, setHistory]   = useState([])      // array of { date, work_dur, profiles }
   const [durCounts, setDurCounts] = useState({})    // { 25: 3, 26: 1, ... }
+  const [streakCounts, setStreakCounts] = useState({ 3: 0, 4: 0, 5: 0 }) // consecutive day streaks
   const [syncing, setSyncing]   = useState(false)
   const deviceId = getDeviceId()
+
+  // ── Calcule combien de fois un streak de longueur K a été atteint ──
+  function calcStreaks(dates) {
+    if (!dates.length) return { 3: 0, 4: 0, 5: 0 }
+    const sorted = [...dates].sort()
+    const runs = []
+    let run = [sorted[0]]
+    for (let i = 1; i < sorted.length; i++) {
+      const diff = (new Date(sorted[i]) - new Date(sorted[i - 1])) / 86400000
+      if (diff === 1) run.push(sorted[i])
+      else { runs.push(run); run = [sorted[i]] }
+    }
+    runs.push(run)
+    const counts = { 3: 0, 4: 0, 5: 0 }
+    runs.forEach(r => [3, 4, 5].forEach(k => { counts[k] += Math.floor(r.length / k) }))
+    return counts
+  }
 
   // ── Load from Supabase on mount ───────────────────────────
   useEffect(() => {
@@ -37,6 +55,7 @@ export function useSessions() {
           counts[d] = (counts[d] || 0) + 1
         })
         setDurCounts(counts)
+        setStreakCounts(calcStreaks(dates))
       }
 
       setSyncing(false)
@@ -50,7 +69,11 @@ export function useSessions() {
     if (history.find(h => h.date === day)) return
 
     const entry = { date: day, work_dur: workDur, profiles }
-    setHistory(h => [entry, ...h])
+    setHistory(h => {
+      const next = [entry, ...h]
+      setStreakCounts(calcStreaks(next.map(e => e.date)))
+      return next
+    })
     setSessions(s => s + 1)
     setDurCounts(c => ({ ...c, [workDur]: (c[workDur] || 0) + 1 }))
 
@@ -68,6 +91,7 @@ export function useSessions() {
       const next = h.filter(e => e.date !== date)
       setSessions(next.length)
       localStorage.setItem('mw_sessions', next.length)
+      setStreakCounts(calcStreaks(next.map(e => e.date)))
       return next
     })
 
@@ -93,5 +117,5 @@ export function useSessions() {
   async function reset()     { setSessions(0); setHistory([]); setDurCounts({}) }
   async function setTo(val)  { setSessions(Math.max(0, Math.min(100, val))) }
 
-  return { sessions, history, durCounts, syncing, increment, decrement, reset, setTo, addHistoryEntry, toggleHistoryEntry }
+  return { sessions, history, durCounts, streakCounts, syncing, increment, decrement, reset, setTo, addHistoryEntry, toggleHistoryEntry }
 }
