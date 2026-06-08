@@ -111,15 +111,30 @@ function CalendarStrip({ history, onToggleDay }) {
             cursor: 'pointer',
           }}
         >
-          <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 16, fontWeight: 900, color: '#000', letterSpacing: '0.04em', marginBottom: 4 }}>
+          <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 16, fontWeight: 900, color: '#000', letterSpacing: '0.04em', marginBottom: 6 }}>
             🗓️ {popup.dateStr}
           </div>
-          <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: '#1a3a00', lineHeight: 1.6 }}>
-            {popup.entry.profiles && popup.entry.profiles.length > 0
-              ? `✅ Military Workout complété par ${popup.entry.profiles.join(', ')}`
-              : '✅ Military Workout complété'}
+          <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 13, color: '#1a3a00', marginBottom: 4, fontWeight: 700, letterSpacing: '0.04em' }}>
+            👤 Participants
           </div>
-          <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: '#1a3a00', marginTop: 2 }}>
+          <div style={{ display: 'flex', gap: 6, marginBottom: 8, flexWrap: 'wrap' }}>
+            {['Éloi', 'Papa', 'Maman'].map(name => {
+              const did = popup.entry.profiles && popup.entry.profiles.includes(name)
+              return (
+                <span key={name} style={{
+                  fontFamily: "'Barlow Condensed', sans-serif",
+                  fontSize: 13, fontWeight: 700,
+                  padding: '3px 10px', borderRadius: 5,
+                  background: did ? '#1a5200' : 'rgba(0,0,0,0.15)',
+                  color: did ? '#a8e63d' : 'rgba(0,0,0,0.35)',
+                  letterSpacing: '0.04em',
+                }}>
+                  {did ? '✓ ' : ''}{name}
+                </span>
+              )
+            })}
+          </div>
+          <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: '#1a3a00' }}>
             ⏱️ {popup.entry.work_dur}s par exercice
           </div>
           <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 9, color: '#2a5a00', marginTop: 6 }}>
