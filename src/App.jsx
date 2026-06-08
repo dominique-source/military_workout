@@ -11,9 +11,11 @@ export default function App() {
   const [screen, setScreen] = useState('home')  // 'home' | 'workout'
   const { sessions, history, durCounts, syncing, increment, decrement, reset: resetSessions, setTo, addHistoryEntry, toggleHistoryEntry } = useSessions()
 
-  // Always keep a fresh ref to session actions so useEffect never captures stale closures
-  const sessionActionsRef = useRef({ increment, addHistoryEntry })
-  useEffect(() => { sessionActionsRef.current = { increment, addHistoryEntry } })
+  // Keep a ref to workDur and activeProfiles for use in handleComplete
+  const workDurRef = useRef(workDur)
+  const activeProfilesRef = useRef(activeProfiles)
+  useEffect(() => { workDurRef.current = workDur }, [workDur])
+  useEffect(() => { activeProfilesRef.current = activeProfiles }, [activeProfiles])
   const [workDur, setWorkDur]       = useState(25)
   const [activeProfiles, setActiveProfiles] = useState(['Éloi', 'Papa', 'Maman'])
 
@@ -179,9 +181,8 @@ export default function App() {
   }, [phase])
 
   // ── Workout complete button ───────────────────────────────
-  function handleComplete() {
-    sessionActionsRef.current.increment()
-    sessionActionsRef.current.addHistoryEntry(workDur, null, activeProfiles)
+  async function handleComplete() {
+    await addHistoryEntry(workDurRef.current, null, activeProfilesRef.current)
     handleReset()
     setScreen('home')
   }
