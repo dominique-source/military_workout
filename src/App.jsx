@@ -9,7 +9,7 @@ import { useSessions } from './hooks/useSessions'
 
 export default function App() {
   const [screen, setScreen] = useState('home')  // 'home' | 'workout'
-  const { sessions, history, syncing, increment, decrement, reset: resetSessions, setTo, addHistoryEntry } = useSessions()
+  const { sessions, history, durCounts, syncing, increment, decrement, reset: resetSessions, setTo, addHistoryEntry } = useSessions()
 
   // Always keep a fresh ref to session actions so useEffect never captures stale closures
   const sessionActionsRef = useRef({ increment, addHistoryEntry })
@@ -174,7 +174,7 @@ export default function App() {
   // ── Workout complete button ───────────────────────────────
   function handleComplete() {
     sessionActionsRef.current.increment()
-    sessionActionsRef.current.addHistoryEntry()
+    sessionActionsRef.current.addHistoryEntry(workDur)
     handleReset()
     setScreen('home')
   }
@@ -183,7 +183,7 @@ export default function App() {
   useEffect(() => () => { clearInterval(ivRef.current); cancel() }, [cancel])
 
   if (screen === 'home') {
-    return <HomePage onEnter={() => setScreen('workout')} sessions={sessions} history={history} syncing={syncing} />
+    return <HomePage onEnter={() => setScreen('workout')} sessions={sessions} history={history} durCounts={durCounts} syncing={syncing} />
   }
 
   return (

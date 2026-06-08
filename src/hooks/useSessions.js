@@ -5,7 +5,8 @@ export function useSessions() {
   const [sessions, setSessions] = useState(() =>
     parseInt(localStorage.getItem('mw_sessions') || '0', 10)
   )
-  const [history, setHistory] = useState([])   // array of 'YYYY-MM-DD' strings
+  const [history, setHistory] = useState([])      // array of 'YYYY-MM-DD' strings
+  const [durCounts, setDurCounts] = useState({})  // { 25: 3, 26: 1, ... }
   const [syncing, setSyncing] = useState(false)
   const deviceId = getDeviceId()
 
@@ -29,14 +30,23 @@ export function useSessions() {
         localStorage.setItem('mw_sessions', best)
       }
 
-      // Load history (last 35 days, shared)
+      // Load history (all sessions, shared)
       const { data: hist } = await supabase
         .from('session_history')
-        .select('session_date')
+        .select('session_date, work_dur')
         .eq('device_id', 'shared')
         .order('session_date', { ascending: false })
 
-      if (hist) setHistory(hist.map(r => r.session_date))
+      if (hist) {
+        setHistory(hist.map(r => r.session_date))
+        // Count sessions per duration
+        const counts = {}
+        hist.forEach(r => {
+          const d = r.work_dur || 25
+          counts[d] = (counts[d] || 0) + 1
+        })
+        setDurCounts(counts)
+      }
 
       setSyncing(false)
     }
@@ -51,14 +61,15 @@ export function useSessions() {
       .upsert({ device_id: 'shared', count: val, updated_at: new Date().toISOString() })
   }
 
-  async function addHistoryEntry() {
+  async function addHistoryEntry(workDur = 25) {
     const today = new Date().toISOString().split('T')[0]
     // Always update local state immediately
     setHistory(h => h.includes(today) ? h : [today, ...h])
+    setDurCounts(c => ({ ...c, [workDur]: (c[workDur] || 0) + 1 }))
     // Upsert to avoid duplicate key errors in DB
     await supabase
       .from('session_history')
-      .upsert({ device_id: 'shared', session_date: today }, { onConflict: 'device_id,session_date', ignoreDuplicates: true })
+      .upsert({ device_id: 'shared', session_date: today, work_dur: workDur }, { onConflict: 'device_id,session_date', ignoreDuplicates: true })
   }
 
   async function increment() {
@@ -79,5 +90,5 @@ export function useSessions() {
     await save(Math.max(0, Math.min(100, val)))
   }
 
-  return { sessions, history, syncing, increment, decrement, reset, setTo, addHistoryEntry }
+  return { sessions, history, durCounts, syncing, increment, decrement, reset, setTo, addHistoryEntry }
 }

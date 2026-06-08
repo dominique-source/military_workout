@@ -1,16 +1,17 @@
 import { useState } from 'react'
 
+// type: 'sessions' = basé sur total sessions, 'dur' = basé sur sessions à X secondes
 const BADGES = [
-  { id: 1,  icon: '🎯', label: 'Première mission',  desc: '1 entraînement complété',     min: 1   },
-  { id: 2,  icon: '🔥', label: 'En feu',             desc: '5 entraînements complétés',   min: 5   },
-  { id: 3,  icon: '💪', label: 'Lancé',              desc: '10 entraînements complétés',  min: 10  },
-  { id: 4,  icon: '⏱️', label: '25 minutes',         desc: 'Tu tiens 25 min par session', min: 20  },
-  { id: 5,  icon: '⚡', label: '26 minutes',         desc: 'Tu tiens 26 min par session', min: 30  },
-  { id: 6,  icon: '🛡️', label: '27 minutes',         desc: 'Tu tiens 27 min par session', min: 40  },
-  { id: 7,  icon: '🎖️', label: '28 minutes',         desc: 'Tu tiens 28 min par session', min: 50  },
-  { id: 8,  icon: '🌟', label: '29 minutes',         desc: 'Tu tiens 29 min par session', min: 65  },
-  { id: 9,  icon: '🏅', label: '30 minutes',         desc: 'Tu tiens 30 min par session', min: 80  },
-  { id: 10, icon: '🏆', label: '100 entraînements',  desc: 'Statut élite atteint !',      min: 100 },
+  { id: 1,  icon: '🎯', label: 'Première mission',   desc: '1 entraînement complété',              type: 'sessions', min: 1,   dur: null, need: 1   },
+  { id: 2,  icon: '🔥', label: 'En feu',              desc: '5 entraînements complétés',            type: 'sessions', min: 5,   dur: null, need: 1   },
+  { id: 3,  icon: '💪', label: 'Lancé',               desc: '10 entraînements complétés',           type: 'sessions', min: 10,  dur: null, need: 1   },
+  { id: 4,  icon: '⏱️', label: '25 secondes',         desc: '10 sessions à 25s par exercice',       type: 'dur',      min: null, dur: 25,  need: 10  },
+  { id: 5,  icon: '⚡', label: '26 secondes',         desc: '10 sessions à 26s par exercice',       type: 'dur',      min: null, dur: 26,  need: 10  },
+  { id: 6,  icon: '🛡️', label: '27 secondes',         desc: '10 sessions à 27s par exercice',       type: 'dur',      min: null, dur: 27,  need: 10  },
+  { id: 7,  icon: '🎖️', label: '28 secondes',         desc: '10 sessions à 28s par exercice',       type: 'dur',      min: null, dur: 28,  need: 10  },
+  { id: 8,  icon: '🌟', label: '29 secondes',         desc: '10 sessions à 29s par exercice',       type: 'dur',      min: null, dur: 29,  need: 10  },
+  { id: 9,  icon: '🏅', label: '30 secondes',         desc: '10 sessions à 30s par exercice',       type: 'dur',      min: null, dur: 30,  need: 10  },
+  { id: 10, icon: '🏆', label: '100 entraînements',   desc: 'Statut élite atteint !',               type: 'sessions', min: 100, dur: null, need: 1   },
 ]
 
 function CalendarStrip({ history }) {
@@ -62,7 +63,7 @@ function CalendarStrip({ history }) {
   )
 }
 
-export default function HomePage({ onEnter, sessions = 0, history = [], syncing = false }) {
+export default function HomePage({ onEnter, sessions = 0, history = [], durCounts = {}, syncing = false }) {
   const [selected, setSelected] = useState(null)
 
   return (
@@ -104,9 +105,11 @@ export default function HomePage({ onEnter, sessions = 0, history = [], syncing 
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10 }}>
           {BADGES.map((badge, i) => {
-            const unlocked = sessions >= badge.min
+            const current = badge.type === 'dur' ? (durCounts[badge.dur] || 0) : sessions
+            const target  = badge.type === 'dur' ? badge.need : badge.min
+            const unlocked = current >= target
             const isSelected = selected === i
-            const pct = Math.min(100, Math.round((sessions / badge.min) * 100))
+            const pct = Math.min(100, Math.round((current / target) * 100))
 
             // ── Style sets ──────────────────────────────────────────
             let cardBg, cardBorder, cardShadow, labelColor, descColor, opacity
@@ -186,7 +189,7 @@ export default function HomePage({ onEnter, sessions = 0, history = [], syncing 
                 {isSelected && (
                   <div style={{ width: '100%', marginTop: 4 }}>
                     <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: unlocked ? '#1a3a00' : '#aaa', marginBottom: 8, fontWeight: 600 }}>
-                      {unlocked ? '✅ Badge déverrouillé !' : `${sessions} / ${badge.min} entraînements`}
+                      {unlocked ? '✅ Badge déverrouillé !' : `${current} / ${target} ${badge.type === 'dur' ? `sessions à ${badge.dur}s` : 'entraînements'}`}
                     </div>
 
                     {/* Track */}
