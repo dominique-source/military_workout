@@ -61,15 +61,31 @@ export function useSessions() {
       .upsert({ device_id: 'shared', count: val, updated_at: new Date().toISOString() })
   }
 
-  async function addHistoryEntry(workDur = 25) {
-    const today = new Date().toISOString().split('T')[0]
-    // Always update local state immediately
-    setHistory(h => h.includes(today) ? h : [today, ...h])
+  async function addHistoryEntry(workDur = 25, date = null) {
+    const day = date || new Date().toISOString().split('T')[0]
+    setHistory(h => h.includes(day) ? h : [day, ...h])
     setDurCounts(c => ({ ...c, [workDur]: (c[workDur] || 0) + 1 }))
-    // Upsert to avoid duplicate key errors in DB
     await supabase
       .from('session_history')
-      .upsert({ device_id: 'shared', session_date: today, work_dur: workDur }, { onConflict: 'device_id,session_date', ignoreDuplicates: true })
+      .upsert({ device_id: 'shared', session_date: day, work_dur: workDur }, { onConflict: 'device_id,session_date', ignoreDuplicates: true })
+  }
+
+  async function removeHistoryEntry(date) {
+    setHistory(h => h.filter(d => d !== date))
+    await supabase
+      .from('session_history')
+      .delete()
+      .eq('device_id', 'shared')
+      .eq('session_date', date)
+  }
+
+  async function toggleHistoryEntry(date) {
+    if (history.includes(date)) {
+      await removeHistoryEntry(date)
+    } else {
+      await addHistoryEntry(25, date)
+      await save(sessions + 1)
+    }
   }
 
   async function increment() {
@@ -90,5 +106,5 @@ export function useSessions() {
     await save(Math.max(0, Math.min(100, val)))
   }
 
-  return { sessions, history, durCounts, syncing, increment, decrement, reset, setTo, addHistoryEntry }
+  return { sessions, history, durCounts, syncing, increment, decrement, reset, setTo, addHistoryEntry, toggleHistoryEntry }
 }

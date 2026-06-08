@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 
 // type: 'sessions' = basé sur total sessions, 'dur' = basé sur sessions à X secondes
 const BADGES = [
@@ -14,7 +14,22 @@ const BADGES = [
   { id: 10, icon: '🏆', label: '100 entraînements',   desc: 'Statut élite atteint !',               type: 'sessions', min: 100, dur: null, need: 1   },
 ]
 
-function CalendarStrip({ history }) {
+function CalendarStrip({ history, onToggleDay }) {
+  const longPressTimer = useRef(null)
+  const [flashing, setFlashing] = useState(null)
+
+  function startLongPress(dateStr) {
+    longPressTimer.current = setTimeout(() => {
+      setFlashing(dateStr)
+      onToggleDay(dateStr)
+      setTimeout(() => setFlashing(null), 400)
+    }, 600)
+  }
+
+  function cancelLongPress() {
+    clearTimeout(longPressTimer.current)
+  }
+
   const days = Array.from({ length: 35 }, (_, i) => {
     const d = new Date()
     d.setHours(0, 0, 0, 0)
@@ -34,15 +49,24 @@ function CalendarStrip({ history }) {
         {days.map(({ dateStr, isToday, done, day, month }) => (
           <div
             key={dateStr}
-            title={dateStr}
+            title={`${dateStr} — long press pour ajouter/retirer`}
+            onMouseDown={() => startLongPress(dateStr)}
+            onMouseUp={cancelLongPress}
+            onMouseLeave={cancelLongPress}
+            onTouchStart={() => startLongPress(dateStr)}
+            onTouchEnd={cancelLongPress}
+            onTouchCancel={cancelLongPress}
             style={{
               width: 28, height: 28, borderRadius: 6,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontFamily: "'IBM Plex Mono', monospace", fontSize: 9, fontWeight: 600,
-              background: done ? '#a8e63d' : isToday ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.03)',
+              background: flashing === dateStr ? '#fff' : done ? '#a8e63d' : isToday ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.03)',
               border: isToday ? '1px solid #639922' : done ? 'none' : '1px solid rgba(255,255,255,0.06)',
               color: done ? '#000' : isToday ? '#639922' : '#555',
               flexShrink: 0,
+              cursor: 'pointer',
+              userSelect: 'none',
+              transition: 'background 0.15s',
             }}
           >
             {day}
@@ -63,7 +87,7 @@ function CalendarStrip({ history }) {
   )
 }
 
-export default function HomePage({ onEnter, sessions = 0, history = [], durCounts = {}, syncing = false }) {
+export default function HomePage({ onEnter, sessions = 0, history = [], durCounts = {}, syncing = false, onToggleDay }) {
   const [selected, setSelected] = useState(null)
 
   return (
@@ -214,7 +238,7 @@ export default function HomePage({ onEnter, sessions = 0, history = [], durCount
         </div>
 
         {/* Calendar */}
-        <CalendarStrip history={history} />
+        <CalendarStrip history={history} onToggleDay={onToggleDay} />
       </div>
     </div>
   )
