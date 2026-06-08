@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { useSessions } from '../hooks/useSessions'
 
 const MILESTONES = {
   10:  '10 done 🔥',
@@ -26,8 +25,7 @@ function getSquareClass(i, marked) {
   return 'sq sq--t1'
 }
 
-export default function SessionTracker() {
-  const { sessions, syncing, increment, decrement, reset, setTo } = useSessions()
+export default function SessionTracker({ sessions = 0, syncing = false, increment, decrement, reset, setTo }) {
   const [popIdx, setPopIdx] = useState(null)
 
   function pop(i) {

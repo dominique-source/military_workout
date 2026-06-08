@@ -9,7 +9,7 @@ import { useSessions } from './hooks/useSessions'
 
 export default function App() {
   const [screen, setScreen] = useState('home')  // 'home' | 'workout'
-  const { increment, addHistoryEntry } = useSessions()
+  const { sessions, history, syncing, increment, decrement, reset: resetSessions, setTo, addHistoryEntry } = useSessions()
   const [exercises, setExercises]   = useState(() => smartShuffle(EXERCISES))
   const [phase, setPhase]           = useState('idle')   // idle | working | transition | resting | done
   const [cur, setCur]               = useState(0)
@@ -172,7 +172,7 @@ export default function App() {
   useEffect(() => () => { clearInterval(ivRef.current); cancel() }, [cancel])
 
   if (screen === 'home') {
-    return <HomePage onEnter={() => setScreen('workout')} />
+    return <HomePage onEnter={() => setScreen('workout')} sessions={sessions} history={history} syncing={syncing} />
   }
 
   return (
@@ -241,7 +241,7 @@ export default function App() {
       </div>
 
       {/* Session tracker */}
-      <SessionTracker />
+      <SessionTracker sessions={sessions} syncing={syncing} increment={increment} decrement={decrement} reset={resetSessions} setTo={setTo} />
     </div>
   )
 }

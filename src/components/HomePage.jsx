@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { useSessions } from '../hooks/useSessions'
 
 const BADGES = [
   { id: 1,  icon: '🎯', label: 'Première mission',  desc: '1 entraînement complété',     min: 1   },
@@ -63,8 +62,7 @@ function CalendarStrip({ history }) {
   )
 }
 
-export default function HomePage({ onEnter }) {
-  const { sessions, history, syncing } = useSessions()
+export default function HomePage({ onEnter, sessions = 0, history = [], syncing = false }) {
   const [selected, setSelected] = useState(null)
 
   return (
