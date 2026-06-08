@@ -5,9 +5,11 @@ import DrillCard from './components/DrillCard'
 import Queue from './components/Queue'
 import SessionTracker from './components/SessionTracker'
 import HomePage from './components/HomePage'
+import { useSessions } from './hooks/useSessions'
 
 export default function App() {
   const [screen, setScreen] = useState('home')  // 'home' | 'workout'
+  const { increment, addHistoryEntry } = useSessions()
   const [exercises, setExercises]   = useState(() => smartShuffle(EXERCISES))
   const [phase, setPhase]           = useState('idle')   // idle | working | transition | resting | done
   const [cur, setCur]               = useState(0)
@@ -156,6 +158,15 @@ export default function App() {
     ivRef.current = setInterval(tick, 1000)
     speak('Go')
   }
+
+  // ── Workout complete ─────────────────────────────────────
+  useEffect(() => {
+    if (phase === 'done') {
+      speak('Military Workout terminé')
+      increment()
+      addHistoryEntry()
+    }
+  }, [phase])
 
   // ── Cleanup ──────────────────────────────────────────────
   useEffect(() => () => { clearInterval(ivRef.current); cancel() }, [cancel])

@@ -48,7 +48,17 @@ export function useSessions() {
     setSessions(val)
     await supabase
       .from('sessions')
-      .upsert({ device_id: deviceId, count: val, updated_at: new Date().toISOString() })
+      .upsert({ device_id: 'shared', count: val, updated_at: new Date().toISOString() })
+  }
+
+  async function addHistoryEntry() {
+    const today = new Date().toISOString().split('T')[0]
+    // Avoid duplicates
+    if (history.includes(today)) return
+    const { error } = await supabase
+      .from('session_history')
+      .insert({ device_id: 'shared', session_date: today })
+    if (!error) setHistory(h => [today, ...h])
   }
 
   async function increment() {
@@ -69,5 +79,5 @@ export function useSessions() {
     await save(Math.max(0, Math.min(100, val)))
   }
 
-  return { sessions, history, syncing, increment, decrement, reset, setTo }
+  return { sessions, history, syncing, increment, decrement, reset, setTo, addHistoryEntry }
 }
