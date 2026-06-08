@@ -11,13 +11,14 @@ export default function App() {
   const [screen, setScreen] = useState('home')  // 'home' | 'workout'
   const { sessions, history, durCounts, syncing, increment, decrement, reset: resetSessions, setTo, addHistoryEntry, toggleHistoryEntry } = useSessions()
 
-  // Keep a ref to workDur and activeProfiles for use in handleComplete
+  const [workDur, setWorkDur]             = useState(25)
+  const [activeProfiles, setActiveProfiles] = useState(['Éloi', 'Papa', 'Maman'])
+
+  // Keep refs in sync for use in async handleComplete
   const workDurRef = useRef(workDur)
   const activeProfilesRef = useRef(activeProfiles)
   useEffect(() => { workDurRef.current = workDur }, [workDur])
   useEffect(() => { activeProfilesRef.current = activeProfiles }, [activeProfiles])
-  const [workDur, setWorkDur]       = useState(25)
-  const [activeProfiles, setActiveProfiles] = useState(['Éloi', 'Papa', 'Maman'])
 
   const PROFILES = ['Éloi', 'Papa', 'Maman']
 
