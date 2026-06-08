@@ -23,11 +23,8 @@ export function useSessions() {
         .single()
 
       if (!error && data) {
-        const remote = data.count
-        const local = parseInt(localStorage.getItem('mw_sessions') || '0', 10)
-        const best = Math.max(remote, local)
-        setSessions(best)
-        localStorage.setItem('mw_sessions', best)
+        setSessions(data.count)
+        localStorage.setItem('mw_sessions', data.count)
       }
 
       // Load history (all sessions, shared)
