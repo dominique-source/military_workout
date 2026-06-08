@@ -14,8 +14,56 @@ const BADGES = [
   { id: 10, icon: '🏆', label: '100 entraînements',  desc: 'Statut élite atteint !',      min: 100 },
 ]
 
+function CalendarStrip({ history }) {
+  const days = Array.from({ length: 35 }, (_, i) => {
+    const d = new Date('2026-06-07')
+    d.setDate(d.getDate() - (34 - i))
+    const dateStr = d.toISOString().split('T')[0]
+    const isToday = i === 34
+    const done = history.includes(dateStr)
+    return { dateStr, isToday, done, day: d.getDate(), month: d.getMonth() }
+  })
+
+  return (
+    <div style={{ width: '100%', maxWidth: 420, marginTop: '2rem' }}>
+      <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#888', marginBottom: '0.75rem' }}>
+        📅 Historique — 35 derniers jours
+      </div>
+      <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+        {days.map(({ dateStr, isToday, done, day, month }) => (
+          <div
+            key={dateStr}
+            title={dateStr}
+            style={{
+              width: 28, height: 28, borderRadius: 6,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontFamily: "'IBM Plex Mono', monospace", fontSize: 9, fontWeight: 600,
+              background: done ? '#a8e63d' : isToday ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.03)',
+              border: isToday ? '1px solid #639922' : done ? 'none' : '1px solid rgba(255,255,255,0.06)',
+              color: done ? '#000' : isToday ? '#639922' : '#555',
+              flexShrink: 0,
+            }}
+          >
+            {day}
+          </div>
+        ))}
+      </div>
+      <div style={{ display: 'flex', gap: 12, marginTop: 8, alignItems: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <div style={{ width: 10, height: 10, borderRadius: 2, background: '#a8e63d' }} />
+          <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 9, color: '#888' }}>Entraînement</span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <div style={{ width: 10, height: 10, borderRadius: 2, border: '1px solid #639922' }} />
+          <span style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 9, color: '#888' }}>Aujourd'hui</span>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function HomePage({ onEnter }) {
-  const { sessions, syncing } = useSessions()
+  const { sessions, history, syncing } = useSessions()
   const [selected, setSelected] = useState(null)
 
   return (
@@ -162,6 +210,9 @@ export default function HomePage({ onEnter }) {
             )
           })}
         </div>
+
+        {/* Calendar */}
+        <CalendarStrip history={history} />
       </div>
     </div>
   )

@@ -5,6 +5,7 @@ export function useSessions() {
   const [sessions, setSessions] = useState(() =>
     parseInt(localStorage.getItem('mw_sessions') || '0', 10)
   )
+  const [history, setHistory] = useState([])   // array of 'YYYY-MM-DD' strings
   const [syncing, setSyncing] = useState(false)
   const deviceId = getDeviceId()
 
@@ -12,10 +13,12 @@ export function useSessions() {
   useEffect(() => {
     async function load() {
       setSyncing(true)
+
+      // Load count
       const { data, error } = await supabase
         .from('sessions')
         .select('count')
-        .eq('device_id', deviceId)
+        .eq('device_id', 'shared')
         .single()
 
       if (!error && data) {
@@ -25,6 +28,16 @@ export function useSessions() {
         setSessions(best)
         localStorage.setItem('mw_sessions', best)
       }
+
+      // Load history (last 35 days, shared)
+      const { data: hist } = await supabase
+        .from('session_history')
+        .select('session_date')
+        .eq('device_id', 'shared')
+        .order('session_date', { ascending: false })
+
+      if (hist) setHistory(hist.map(r => r.session_date))
+
       setSyncing(false)
     }
     load()
@@ -56,5 +69,5 @@ export function useSessions() {
     await save(Math.max(0, Math.min(100, val)))
   }
 
-  return { sessions, syncing, increment, decrement, reset, setTo }
+  return { sessions, history, syncing, increment, decrement, reset, setTo }
 }
