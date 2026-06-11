@@ -104,7 +104,17 @@ export function useSessions() {
 
   // ── Toggle a day (long press on calendar) ─────────────────
   async function updateHistoryEntry(date, newProfiles, newWorkDur) {
-    setHistory(h => h.map(e => e.date === date ? { ...e, profiles: newProfiles, work_dur: newWorkDur } : e))
+    setHistory(h => {
+      const next = h.map(e => e.date === date ? { ...e, profiles: newProfiles, work_dur: newWorkDur } : e)
+      // Recalculate durCounts from updated history
+      const counts = {}
+      next.forEach(e => {
+        const d = e.work_dur || 25
+        counts[d] = (counts[d] || 0) + 1
+      })
+      setDurCounts(counts)
+      return next
+    })
     await supabase
       .from('session_history')
       .update({ profiles: newProfiles, work_dur: newWorkDur })
