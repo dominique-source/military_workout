@@ -17,10 +17,90 @@ const BADGES = [
   { id: 10, icon: '🏆', label: '100 entraînements',   desc: 'Statut élite atteint !',               type: 'sessions', min: 100, dur: null, need: 100 },
 ]
 
-function CalendarStrip({ history, onToggleDay }) {
+function EditModal({ entry, onSave, onClose }) {
+  const [profiles, setProfiles] = useState(entry.profiles || [])
+  const [workDur, setWorkDur] = useState(entry.work_dur || 25)
+  const NAMES = ['Éloi', 'Papa', 'Maman']
+
+  function toggleName(name) {
+    setProfiles(p => p.includes(name) ? p.filter(x => x !== name) : [...p, name])
+  }
+
+  return (
+    <div style={{
+      position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      zIndex: 100, padding: '1rem',
+    }} onClick={onClose}>
+      <div onClick={e => e.stopPropagation()} style={{
+        background: '#1f2e1f', border: '1px solid #3a4f3a',
+        borderRadius: 16, padding: '1.5rem', width: '100%', maxWidth: 340,
+      }}>
+        <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 20, fontWeight: 900, color: '#f0f0f0', marginBottom: '1.25rem', letterSpacing: '0.04em' }}>
+          ✏️ Modifier — {entry.date}
+        </div>
+
+        {/* Participants */}
+        <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 10, color: '#888', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 10 }}>Participants</div>
+        <div style={{ display: 'flex', gap: 8, marginBottom: '1.25rem' }}>
+          {NAMES.map(name => {
+            const active = profiles.includes(name)
+            return (
+              <button key={name} onClick={() => toggleName(name)} style={{
+                flex: 1, padding: '10px 0',
+                borderRadius: 8,
+                border: `1px solid ${active ? '#a8e63d' : '#3a4f3a'}`,
+                background: active ? '#a8e63d' : 'transparent',
+                color: active ? '#000' : '#888',
+                fontFamily: "'Barlow Condensed', sans-serif",
+                fontSize: 15, fontWeight: 700, cursor: 'pointer',
+                transition: 'all 0.15s',
+              }}>{name}</button>
+            )
+          })}
+        </div>
+
+        {/* Duration */}
+        <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 10, color: '#888', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 10 }}>Secondes par exercice</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: '1.5rem' }}>
+          <button onClick={() => setWorkDur(v => Math.max(10, v - 1))} style={{
+            width: 40, height: 40, borderRadius: 8, background: '#2a3d2a',
+            border: '1px solid #3a4f3a', color: '#f0f0f0', fontSize: 20,
+            cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>−</button>
+          <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 32, fontWeight: 900, color: '#a8e63d', flex: 1, textAlign: 'center' }}>{workDur}s</span>
+          <button onClick={() => setWorkDur(v => Math.min(60, v + 1))} style={{
+            width: 40, height: 40, borderRadius: 8, background: '#2a3d2a',
+            border: '1px solid #3a4f3a', color: '#f0f0f0', fontSize: 20,
+            cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>+</button>
+        </div>
+
+        {/* Buttons */}
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button onClick={onClose} style={{
+            flex: 1, padding: '12px 0', borderRadius: 8,
+            border: '1px solid #3a4f3a', background: 'transparent',
+            color: '#888', fontFamily: "'Barlow Condensed', sans-serif",
+            fontSize: 15, fontWeight: 700, cursor: 'pointer',
+          }}>Annuler</button>
+          <button onClick={() => onSave(profiles, workDur)} style={{
+            flex: 2, padding: '12px 0', borderRadius: 8,
+            border: 'none', background: '#a8e63d',
+            color: '#000', fontFamily: "'Barlow Condensed', sans-serif",
+            fontSize: 15, fontWeight: 900, cursor: 'pointer',
+          }}>✓ Sauvegarder</button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function CalendarStrip({ history, onToggleDay, onUpdateDay }) {
   const longPressTimer = useRef(null)
   const [flashing, setFlashing] = useState(null)
-  const [popup, setPopup] = useState(null) // { dateStr, entry }
+  const [popup, setPopup] = useState(null)
+  const [editing, setEditing] = useState(null) // entry being edited
   const didLongPress = useRef(false)
 
   function startLongPress(dateStr) {
@@ -36,12 +116,15 @@ function CalendarStrip({ history, onToggleDay }) {
   function cancelLongPress(dateStr, entry) {
     clearTimeout(longPressTimer.current)
     if (!didLongPress.current) {
-      // Quick tap → show popup
-      if (entry) {
-        setPopup(p => p?.dateStr === dateStr ? null : { dateStr, entry })
-      }
+      if (entry) setPopup(p => p?.dateStr === dateStr ? null : { dateStr, entry })
     }
     didLongPress.current = false
+  }
+
+  function handleSave(profiles, workDur) {
+    onUpdateDay(editing.date, profiles, workDur)
+    setEditing(null)
+    setPopup(null)
   }
 
   const days = Array.from({ length: 35 }, (_, i) => {
@@ -61,33 +144,30 @@ function CalendarStrip({ history, onToggleDay }) {
         📅 Historique — 35 derniers jours
       </div>
       <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-        {days.map(({ dateStr, isToday, done, entry, day, month }) => (
-          <div
-            key={dateStr}
-            title={`${dateStr} — clic: détails, long press: ajouter/retirer`}
-            onMouseDown={() => startLongPress(dateStr)}
-            onMouseUp={() => cancelLongPress(dateStr, entry)}
-            onMouseLeave={() => clearTimeout(longPressTimer.current)}
-            onTouchStart={e => { e.preventDefault(); startLongPress(dateStr) }}
-            onTouchEnd={() => cancelLongPress(dateStr, entry)}
-            onTouchCancel={() => clearTimeout(longPressTimer.current)}
-            style={{
-              width: 28, height: 28, borderRadius: 6,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontFamily: "'IBM Plex Mono', monospace", fontSize: 9, fontWeight: 600,
-              background: flashing === dateStr ? '#fff' : done ? '#a8e63d' : isToday ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.03)',
-              border: isToday ? '1px solid #639922' : done ? 'none' : '1px solid rgba(255,255,255,0.06)',
-              color: done ? '#000' : isToday ? '#639922' : '#555',
-              flexShrink: 0,
-              cursor: 'pointer',
-              userSelect: 'none',
-              WebkitUserSelect: 'none',
-              WebkitTouchCallout: 'none',
-              transition: 'background 0.15s',
-            }}
-          >
-            {day}
-          </div>
+        {days.map(({ dateStr, isToday, done, entry, day }) => (
+          <div key={dateStr} style={{ position: 'relative', flexShrink: 0 }}>
+            <div
+              onMouseDown={() => startLongPress(dateStr)}
+              onMouseUp={() => cancelLongPress(dateStr, entry)}
+              onMouseLeave={() => clearTimeout(longPressTimer.current)}
+              onTouchStart={e => { e.preventDefault(); startLongPress(dateStr) }}
+              onTouchEnd={() => cancelLongPress(dateStr, entry)}
+              onTouchCancel={() => clearTimeout(longPressTimer.current)}
+              style={{
+                width: 28, height: 28, borderRadius: 6,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontFamily: "'IBM Plex Mono', monospace", fontSize: 9, fontWeight: 600,
+                background: flashing === dateStr ? '#fff' : done ? '#a8e63d' : isToday ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.03)',
+                border: isToday ? '1px solid #639922' : done ? 'none' : '1px solid rgba(255,255,255,0.06)',
+                color: done ? '#000' : isToday ? '#639922' : '#555',
+                cursor: 'pointer',
+                userSelect: 'none', WebkitUserSelect: 'none', WebkitTouchCallout: 'none',
+                transition: 'background 0.15s',
+              }}
+            >
+              {day}
+            </div>
+            </div>
         ))}
       </div>
       <div style={{ display: 'flex', gap: 12, marginTop: 8, alignItems: 'center' }}>
@@ -140,16 +220,36 @@ function CalendarStrip({ history, onToggleDay }) {
           <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 11, color: '#1a3a00' }}>
             ⏱️ {popup.entry.work_dur}s par exercice
           </div>
-          <div style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: 9, color: '#2a5a00', marginTop: 6 }}>
-            Appuie pour fermer
+          <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+            <button
+              onClick={() => { setEditing(popup.entry); setPopup(null) }}
+              style={{
+                flex: 1, padding: '9px 0', borderRadius: 7,
+                border: '1px solid #1a5200', background: '#1a5200',
+                color: '#a8e63d', fontFamily: "'Barlow Condensed', sans-serif",
+                fontSize: 14, fontWeight: 700, cursor: 'pointer', letterSpacing: '0.05em',
+              }}
+            >✏️ Modifier</button>
+            <button
+              onClick={() => setPopup(null)}
+              style={{
+                flex: 1, padding: '9px 0', borderRadius: 7,
+                border: '1px solid rgba(0,0,0,0.2)', background: 'rgba(0,0,0,0.15)',
+                color: '#1a3a00', fontFamily: "'Barlow Condensed', sans-serif",
+                fontSize: 14, fontWeight: 700, cursor: 'pointer',
+              }}
+            >Fermer</button>
           </div>
         </div>
       )}
+
+      {/* Edit modal */}
+      {editing && <EditModal entry={editing} onSave={handleSave} onClose={() => setEditing(null)} />}
     </div>
   )
 }
 
-export default function HomePage({ onEnter, sessions = 0, history = [], durCounts = {}, streakCounts = {}, syncing = false, onToggleDay }) {
+export default function HomePage({ onEnter, sessions = 0, history = [], durCounts = {}, streakCounts = {}, syncing = false, onToggleDay, onUpdateDay }) {
   const [selected, setSelected] = useState(null)
 
   return (
@@ -305,7 +405,7 @@ export default function HomePage({ onEnter, sessions = 0, history = [], durCount
         </div>
 
         {/* Calendar */}
-        <CalendarStrip history={history} onToggleDay={onToggleDay} />
+        <CalendarStrip history={history} onToggleDay={onToggleDay} onUpdateDay={onUpdateDay} />
       </div>
     </div>
   )

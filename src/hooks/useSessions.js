@@ -103,6 +103,15 @@ export function useSessions() {
   }
 
   // ── Toggle a day (long press on calendar) ─────────────────
+  async function updateHistoryEntry(date, newProfiles, newWorkDur) {
+    setHistory(h => h.map(e => e.date === date ? { ...e, profiles: newProfiles, work_dur: newWorkDur } : e))
+    await supabase
+      .from('session_history')
+      .update({ profiles: newProfiles, work_dur: newWorkDur })
+      .eq('device_id', 'shared')
+      .eq('session_date', date)
+  }
+
   async function toggleHistoryEntry(date) {
     if (history.find(h => h.date === date)) {
       await removeHistoryEntry(date)
@@ -117,5 +126,5 @@ export function useSessions() {
   async function reset()     { setSessions(0); setHistory([]); setDurCounts({}) }
   async function setTo(val)  { setSessions(Math.max(0, Math.min(100, val))) }
 
-  return { sessions, history, durCounts, streakCounts, syncing, increment, decrement, reset, setTo, addHistoryEntry, toggleHistoryEntry }
+  return { sessions, history, durCounts, streakCounts, syncing, increment, decrement, reset, setTo, addHistoryEntry, toggleHistoryEntry, updateHistoryEntry }
 }
