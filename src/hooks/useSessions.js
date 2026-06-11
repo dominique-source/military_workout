@@ -126,7 +126,7 @@ export function useSessions() {
     if (history.find(h => h.date === date)) {
       await removeHistoryEntry(date)
     } else {
-      await addHistoryEntry(25, date, [])
+      await addHistoryEntry(25, date, ['Éloi', 'Papa', 'Maman'])
     }
   }
 
