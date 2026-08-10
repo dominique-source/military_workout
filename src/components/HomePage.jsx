@@ -261,7 +261,7 @@ export default function HomePage({ onEnter, sessions = 0, history = [], durCount
 
       {/* App icon */}
       <button
-        onClick={onEnter}
+        onClick={() => onEnter('classic')}
         style={{
           background: 'none', border: 'none', cursor: 'pointer', padding: 0,
           boxShadow: '0 0 40px rgba(99,153,34,0.25), 0 8px 32px rgba(0,0,0,0.3)',
@@ -282,6 +282,29 @@ export default function HomePage({ onEnter, sessions = 0, history = [], durCount
         <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 42, fontWeight: 900, letterSpacing: '0.06em', color: '#f0f0f0', lineHeight: 1, textTransform: 'uppercase' }}>Military</div>
         <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 42, fontWeight: 900, letterSpacing: '0.06em', color: '#639922', lineHeight: 1, textTransform: 'uppercase' }}>Workout</div>
       </div>
+
+      {/* No-jump mode button */}
+      <button
+        onClick={() => onEnter('nojump')}
+        style={{
+          marginTop: '1.25rem',
+          display: 'flex', alignItems: 'center', gap: 8,
+          padding: '11px 20px',
+          borderRadius: 999,
+          border: '1px solid rgba(99,153,34,0.5)',
+          background: 'rgba(99,153,34,0.1)',
+          color: '#a8e63d',
+          fontFamily: "'Barlow Condensed', sans-serif",
+          fontSize: 15, fontWeight: 700, letterSpacing: '0.04em',
+          textTransform: 'uppercase',
+          cursor: 'pointer',
+          transition: 'all 0.15s',
+        }}
+        onMouseEnter={e => { e.currentTarget.style.background = 'rgba(99,153,34,0.2)'; e.currentTarget.style.borderColor = '#639922' }}
+        onMouseLeave={e => { e.currentTarget.style.background = 'rgba(99,153,34,0.1)'; e.currentTarget.style.borderColor = 'rgba(99,153,34,0.5)' }}
+      >
+        🚫🦘 Military Workout — Sans sauts
+      </button>
 
       {/* Badges */}
       <div style={{ marginTop: '2.5rem', width: '100%', maxWidth: 420 }}>

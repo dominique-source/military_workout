@@ -62,3 +62,50 @@ export function smartShuffle(arr) {
   }
   return a
 }
+
+// ─── No-jump exercise pool ────────────────────────────────────
+// Pure calisthenics — no jumping, no running. Used for the "No Jump" mode.
+export const NO_JUMP_EXERCISES = [
+  { name: 'Push-ups (standard)',    anim: 'pushup',    cat: 'push',   desc: 'Chest to floor, full lockout at top. Elbows 45° from body. Controlled tempo, no rushing.' },
+  { name: 'Push-ups (diamond)',     anim: 'pushup',    cat: 'push',   desc: 'Hands form a diamond under your chest. Triceps-focused. Full range every rep.' },
+  { name: 'Push-ups (wide-grip)',   anim: 'pushup',    cat: 'push',   desc: 'Hands wider than shoulders. Chest does the work. Keep hips level, no sagging.' },
+  { name: 'Bodyweight squats',      anim: 'squat',     cat: 'squat',  desc: 'Feet shoulder-width, sit back and down to parallel. Drive through heels — no jump.' },
+  { name: 'Lunges',                 anim: 'lunge',     cat: 'squat',  desc: 'Step into a lunge, front knee over ankle, back knee light tap. Alternate legs, stay controlled.' },
+  { name: 'Sit-ups',                anim: 'crunch',    cat: 'core',   desc: 'Feet anchored, curl all the way up to your knees, lower with control.' },
+  { name: 'Flutter kicks',          anim: 'flutter',   cat: 'core',   desc: 'Lower back pressed flat. Legs a few inches off the floor, small rapid kicks.' },
+  { name: 'Leg raises',             anim: 'legraise',  cat: 'core',   desc: 'Lying flat, legs straight, raise to vertical without swinging. Lower slow — don\'t let feet touch down.' },
+  { name: 'Plank hold',             anim: 'plank',     cat: 'core',   desc: 'Rigid from head to heels. Squeeze glutes and abs. Breathe steady.' },
+  { name: 'Side plank hold',        anim: 'sideplank', cat: 'core',   desc: 'Forearm on ground, body straight. Stack or stagger feet for balance.' },
+  { name: 'Mountain climbers',      anim: 'hiknees',   cat: 'core',   desc: 'Plank position, drive knees to chest one at a time. Slow controlled tempo — no hop.' },
+  { name: 'Bear crawl',             anim: 'donkey',    cat: 'cardio', desc: 'Hands and feet on the ground, knees hovering. Crawl in place or a short distance, back flat.' },
+  { name: 'Crab walk',              anim: 'bridge',    cat: 'cardio', desc: 'Hands and feet on ground, hips lifted. Walk forward or hold, keep hips high.' },
+  { name: 'Bicycle crunches',       anim: 'vup',       cat: 'core',   desc: 'Elbow to opposite knee, extend the other leg. Slow controlled rotation — no yanking the neck.' },
+  { name: 'Supermans',              anim: 'superman',  cat: 'core',   desc: 'Face down, lift chest and legs together. Squeeze glutes and back at the top.' },
+  { name: 'Wall sit',               anim: 'wallsit',   cat: 'squat',  desc: 'Thighs parallel to floor, back flat on wall. Hold steady, breathe through the burn.' },
+  { name: 'Glute bridges',          anim: 'bridge',    cat: 'core',   desc: 'Feet flat, drive hips to ceiling, squeeze glutes hard at the top. Hold a beat each rep.' },
+  { name: 'Scissor kicks',          anim: 'flutter',   cat: 'core',   desc: 'Legs straight and low off the floor, cross over each other. Core braced throughout.' },
+  { name: 'Russian twists',         anim: 'twist',     cat: 'core',   desc: 'Seated, lean back slightly, rotate torso side to side. Feet up for extra challenge, down for control.' },
+  { name: '8-count bodybuilders',   anim: 'inchworm',  cat: 'push',   desc: 'Squat down, step back to plank one leg at a time, push-up, step back in, stand. No jump.' },
+  { name: 'Squat thrusts',          anim: 'inchworm',  cat: 'squat',  desc: 'Squat, step feet back to plank, step back in, stand. No push-up, no jump.' },
+  { name: 'High knees (marching)',  anim: 'hiknees',   cat: 'cardio', desc: 'March in place, drive knees to hip height. Controlled tempo, pump your arms, stay tall.' },
+  { name: 'Arm circles',            anim: 'armcircle', cat: 'push',   desc: 'Arms straight out, small fast circles forward then back. Shoulders down, core tight.' },
+  { name: 'Low crawl',              anim: 'plank',     cat: 'cardio', desc: 'On elbows and knees, stay low, pull yourself forward. Military-style, controlled and steady.' },
+  { name: 'Duck walk',              anim: 'squat',     cat: 'squat',  desc: 'Deep squat position, waddle forward staying low. Thighs stay parallel to the ground.' },
+]
+
+// ─── Build a fixed-length drill set from a pool ──────────────
+// Uses every pool item once (shuffled), then fills the remainder
+// with random picks (never repeating the previous drill), and
+// applies smartShuffle's push/squat spacing rule to the result.
+export function buildDrillSet(pool, n = 30) {
+  if (pool.length >= n) return smartShuffle(pool).slice(0, n)
+  const result = smartShuffle(pool)
+  while (result.length < n) {
+    let candidate
+    do {
+      candidate = pool[Math.floor(Math.random() * pool.length)]
+    } while (pool.length > 1 && candidate.name === result[result.length - 1].name)
+    result.push(candidate)
+  }
+  return smartShuffle(result)
+}

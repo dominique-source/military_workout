@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { EXERCISES, smartShuffle, TRANS_DUR, REST_DUR, REST_AFTER } from './data/exercises'
+import { EXERCISES, NO_JUMP_EXERCISES, buildDrillSet, TRANS_DUR, REST_DUR, REST_AFTER } from './data/exercises'
 import { useVoice } from './hooks/useVoice'
 import DrillCard from './components/DrillCard'
 import Queue from './components/Queue'
@@ -9,6 +9,7 @@ import { useSessions } from './hooks/useSessions'
 
 export default function App() {
   const [screen, setScreen] = useState('home')  // 'home' | 'workout'
+  const [mode, setMode] = useState('classic')    // 'classic' | 'nojump'
   const { sessions, history, durCounts, streakCounts, syncing, increment, decrement, reset: resetSessions, setTo, addHistoryEntry, toggleHistoryEntry, updateHistoryEntry } = useSessions()
 
   const [workDur, setWorkDur]             = useState(25)
@@ -25,7 +26,7 @@ export default function App() {
   function toggleProfile(name) {
     setActiveProfiles(p => p.includes(name) ? p.filter(x => x !== name) : [...p, name])
   }        // adjustable seconds per drill
-  const [exercises, setExercises]   = useState(() => smartShuffle(EXERCISES))
+  const [exercises, setExercises]   = useState(() => buildDrillSet(EXERCISES))
   const [phase, setPhase]           = useState('idle')   // idle | working | transition | resting | done
   const [cur, setCur]               = useState(0)
   const [timeLeft, setTimeLeft]     = useState(25)
@@ -139,13 +140,28 @@ export default function App() {
   function handleShuffle() {
     clearInterval(ivRef.current)
     cancel()
-    setExercises(smartShuffle(EXERCISES))
+    setExercises(buildDrillSet(mode === 'nojump' ? NO_JUMP_EXERCISES : EXERCISES))
     setIsShuffled(true)
     setRunning(false)
     setPhase('idle')
     setCur(0)
     setTimeLeft(workDur)
     setPreviewIdx(null)
+  }
+
+  // ── Enter workout from home ───────────────────────────────
+  function handleEnter(selectedMode) {
+    clearInterval(ivRef.current)
+    cancel()
+    setMode(selectedMode)
+    setExercises(buildDrillSet(selectedMode === 'nojump' ? NO_JUMP_EXERCISES : EXERCISES))
+    setIsShuffled(false)
+    setRunning(false)
+    setPhase('idle')
+    setCur(0)
+    setTimeLeft(workDur)
+    setPreviewIdx(null)
+    setScreen('workout')
   }
 
   // ── Queue click ──────────────────────────────────────────
@@ -192,7 +208,7 @@ export default function App() {
   useEffect(() => () => { clearInterval(ivRef.current); cancel() }, [cancel])
 
   if (screen === 'home') {
-    return <HomePage onEnter={() => setScreen('workout')} sessions={sessions} history={history} durCounts={durCounts} streakCounts={streakCounts} syncing={syncing} onToggleDay={toggleHistoryEntry} onUpdateDay={updateHistoryEntry} />
+    return <HomePage onEnter={handleEnter} sessions={sessions} history={history} durCounts={durCounts} streakCounts={streakCounts} syncing={syncing} onToggleDay={toggleHistoryEntry} onUpdateDay={updateHistoryEntry} />
   }
 
   return (
@@ -219,7 +235,7 @@ export default function App() {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
         <div>
-          <div className="t-label" style={{ marginBottom: 3 }}>Military Blitz</div>
+          <div className="t-label" style={{ marginBottom: 3 }}>{mode === 'nojump' ? 'Military Workout — No Jump' : 'Military Blitz'}</div>
           <div className="t-display" style={{ fontSize: 22, color: 'var(--text)' }}>30 Drills · {workDur}s each</div>
         </div>
         <div style={{ textAlign: 'right' }}>
